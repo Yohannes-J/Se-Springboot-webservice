@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Management</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: #f2f2f2;
+            color: #222;
+            transition: background 0.3s, color 0.3s;
+        }
+        body.dark {
+            background: #111;
+            color: #eee;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+        }
+        table.dark { background: #1b1b1b; }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+        th { background: #e5e5e5; cursor: pointer; }
+        th.dark { background: #2a2a2a; }
+        th.sortable:hover { background: #ddd; }
+        th.dark.sortable:hover { background: #333; }
+        button { padding: 6px 12px; cursor: pointer; margin: 2px; }
+        input { margin: 4px; padding: 6px; }
+
+        #toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #000;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #modalBackdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        #modalBox {
+            background: #fff;
+            padding: 20px;
+            width: 400px;
+            border-radius: 5px;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        a { cursor: pointer; color: blue; text-decoration: underline; margin-right:10px; }
+    </style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<h2>Student Management</h2>
+<a data-page="listPage">Student List</a>
+<a data-page="addPage">Add Student</a>
+
+<label style="float:right;">
+    <input type="checkbox" id="darkToggle"> Dark Mode
+</label>
+
+<!-- STUDENT LIST PAGE -->
+<div id="listPage" class="page active">
+
+    <br>
+    <input id="searchInput" placeholder="Search...">
+    <button id="searchBtn">Search</button>
+    <button id="clearSearchBtn">Clear</button>
+
+    <h3 id="countText">0 students</h3>
+
+    <!-- Pagination -->
+    <button id="prevBtn">Previous</button>
+    <button id="nextBtn">Next</button>
+    <span id="pageInfo"></span>
+
+    <table id="studentsTable">
+        <thead>
+        <tr>
+            <th class="sortable" data-col="name">Name <span id="s_name"></span></th>
+            <th class="sortable" data-col="age">Age <span id="s_age"></span></th>
+            <th class="sortable" data-col="gender">Gender</th>
+            <th class="sortable" data-col="department">Department <span id="s_department"></span></th>
+            <th class="sortable" data-col="email">Email</th>
+            <th class="sortable" data-col="phone">Phone</th>
+            <th class="sortable" data-col="address">Address</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="studentsBody"></tbody>
+    </table>
+</div>
+
+<!-- ADD STUDENT PAGE -->
+<div id="addPage" class="page">
+    <h3>Add New Student</h3>
+    <form id="addForm">
+        <input name="name" placeholder="Name" required>
+        <input name="age" type="number" placeholder="Age">
+        <input name="gender" placeholder="Gender">
+        <input name="department" placeholder="Department">
+        <input name="email" placeholder="Email">
+        <input name="phone" placeholder="Phone">
+        <input name="address" placeholder="Address">
+        <button type="submit">Add Student</button>
+    </form>
+</div>
+
+<!-- MODAL -->
+<div id="modalBackdrop">
+    <div id="modalBox">
+        <h3>Edit Student</h3>
+        <form id="editForm">
+            <input id="editId" readonly><br>
+            <input id="editName" placeholder="Name"><br>
+            <input id="editAge" placeholder="Age"><br>
+            <input id="editGender" placeholder="Gender"><br>
+            <input id="editDepartment" placeholder="Department"><br>
+            <input id="editEmail" placeholder="Email"><br>
+            <input id="editPhone" placeholder="Phone"><br>
+            <input id="editAddress" placeholder="Address"><br>
+            <button type="submit">Save</button>
+            <button id="delBtn" type="button">Delete</button>
+            <button id="cancelEdit" type="button">Cancel</button>
+        </form>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+    // ----------------- PAGE NAVIGATION -----------------
+    document.querySelectorAll('a[data-page]').forEach(link => {
+        link.onclick = () => {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(link.dataset.page).classList.add('active');
+        };
+    });
+
+    // ----------------- DARK MODE -----------------
+    darkToggle.onchange = () => document.body.classList.toggle('dark', darkToggle.checked);
+
+    // ----------------- VARIABLES -----------------
+    const API_LIST = "/api/students/list";
+    const API_BASE = "/api/students";
+
+    let currentPage = 0;
+    let totalPages = 0;
+    let sortBy = "name";
+    let sortDir = "asc";
+    let currentSearch = "";
+
+    function showToast(msg) {
+        toast.innerText = msg;
+        toast.style.opacity = 1;
+        setTimeout(() => toast.style.opacity = 0, 1500);
+    }
+
+    async function jsonFetch(url, opts={}) {
+        opts.headers = { "Content-Type": "application/json" };
+        const res = await fetch(url, opts);
+        if(!res.ok) throw new Error(await res.text());
+        return res.json();
+    }
+
+    // ----------------- LOAD STUDENTS -----------------
+    async function loadStudents() {
+        const q = `?page=${currentPage}&size=10&sortBy=${sortBy}&sortDir=${sortDir}&search=${currentSearch}`;
+        const res = await jsonFetch(API_LIST + q);
+
+        studentsBody.innerHTML = res.data.length ? res.data.map(s => `
+            <tr data-id="${s.id}">
+                <td>${s.name}</td>
+                <td>${s.age}</td>
+                <td>${s.gender}</td>
+                <td>${s.department}</td>
+                <td>${s.email}</td>
+                <td>${s.phone}</td>
+                <td>${s.address}</td>
+                <td>
+                    <button data-action="edit">Edit</button>
+                    <button data-action="delete">Delete</button>
+                </td>
+            </tr>
+        `).join('') : `<tr><td colspan="8">No data</td></tr>`;
+
+        totalPages = res.totalPages;
+        pageInfo.innerText = `Page ${res.currentPage + 1} of ${res.totalPages}`;
+        countText.innerText = `${res.recordsTotal} students`;
+
+        updateSortIcons();
+    }
+
+    // ----------------- SORTING -----------------
+    document.querySelectorAll("th.sortable").forEach(th => {
+        th.addEventListener("click", () => {
+            const col = th.dataset.col;
+            if (sortBy === col) sortDir = sortDir==="asc"?"desc":"asc";
+            else { sortBy=col; sortDir="asc"; }
+            loadStudents();
+        });
+    });
+    function updateSortIcons() {
+        ["name","age","department"].forEach(col => {
+            document.getElementById("s_"+col).innerText = sortBy===col?(sortDir==="asc"?"▲":"▼"):"";
+        });
+    }
+
+    // ----------------- PAGINATION -----------------
+    prevBtn.onclick = ()=> { if(currentPage>0){currentPage--; loadStudents();} };
+    nextBtn.onclick = ()=> { if(currentPage<totalPages-1){currentPage++; loadStudents();} };
+
+    // ----------------- SEARCH -----------------
+    searchBtn.onclick = ()=> { currentSearch=searchInput.value; currentPage=0; loadStudents(); };
+    clearSearchBtn.onclick = ()=> { currentSearch=""; searchInput.value=""; currentPage=0; loadStudents(); };
+
+    // ----------------- TABLE ACTIONS -----------------
+    studentsTable.onclick = async (e) => {
+        const tr = e.target.closest("tr[data-id]");
+        if(!tr) return;
+        const id = tr.dataset.id;
+        const action = e.target.dataset.action;
+
+        if(action==="delete") {
+            if(!confirm("Delete?")) return;
+            await fetch(`${API_BASE}/${id}`, {method:"DELETE"});
+            showToast("Deleted");
+            loadStudents();
+        }
+
+        if(action==="edit") {
+            const res = await jsonFetch(API_LIST + "?page=0&size=1000");
+            const stu = res.data.find(s=>s.id==id);
+            openModal(stu);
+        }
+    };
+
+    function openModal(stu){
+        editId.value=stu.id;
+        editName.value=stu.name;
+        editAge.value=stu.age;
+        editGender.value=stu.gender;
+        editDepartment.value=stu.department;
+        editEmail.value=stu.email;
+        editPhone.value=stu.phone;
+        editAddress.value=stu.address;
+        modalBackdrop.style.display="flex";
+    }
+
+    cancelEdit.onclick = ()=> modalBackdrop.style.display="none";
+
+    editForm.onsubmit = async (e)=>{
+        e.preventDefault();
+        const body = {
+            name: editName.value,
+            age: Number(editAge.value),
+            gender: editGender.value,
+            department: editDepartment.value,
+            email: editEmail.value,
+            phone: editPhone.value,
+            address: editAddress.value
+        };
+        await fetch(`${API_BASE}/${editId.value}`, {method:"PUT", body:JSON.stringify(body), headers:{"Content-Type":"application/json"}});
+        showToast("Saved");
+        modalBackdrop.style.display="none";
+        loadStudents();
+    };
+
+    delBtn.onclick = async ()=>{
+        if(!confirm("Delete?")) return;
+        await fetch(`${API_BASE}/${editId.value}`, {method:"DELETE"});
+        showToast("Deleted");
+        modalBackdrop.style.display="none";
+        loadStudents();
+    };
+
+    // ----------------- ADD STUDENT -----------------
+    addForm.onsubmit = async (e)=>{
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(addForm));
+        data.age=Number(data.age);
+        await fetch(API_BASE,{method:"POST",body:JSON.stringify(data),headers:{"Content-Type":"application/json"}});
+        showToast("Added!");
+        addForm.reset();
+        // Go to list page
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        listPage.classList.add('active');
+        currentPage=0;
+        loadStudents();
+    };
+
+    loadStudents();
+</script>
+
+</body>
+</html>
