@@ -1,0 +1,145 @@
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+const AuthPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [form, setForm] = useState({
+    username: "",
+    password: "",
+    role: "USER",
+  });
+  const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate();
+
+  // Handle input changes
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Handle form submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (isLogin) {
+        // ===== LOGIN =====
+        const res = await axios.post(
+          "https://localhost:8081/auth/login",
+          {
+            username: form.username,
+            password: form.password,
+          },
+          { withCredentials: true } // if backend uses cookies
+        );
+
+        // Flexible handling of backend response
+        const token = res?.data?.token || res?.data?.jwt;
+        const user = res?.data?.user || res?.data?.data || { role: "USER" };
+
+        if (!token) {
+          throw new Error("Login failed: no token returned from server");
+        }
+
+        // Save to localStorage
+        localStorage.setItem("token", token);
+        localStorage.setItem("user", JSON.stringify(user));
+
+        // Redirect by role
+        navigate(user.role === "ADMIN" ? "/home" : "/dashboard");
+
+      } else {
+        // ===== REGISTER =====
+        await axios.post(
+          "https://localhost:8081/user/register",
+          {
+            username: form.username,
+            password: form.password,
+            role: form.role,
+          },
+          { withCredentials: true }
+        );
+
+        alert("Account created successfully. Please login.");
+        setForm({ username: "", password: "", role: "USER" });
+        setIsLogin(true);
+      }
+    } catch (err) {
+      console.error(err);
+      alert(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Authentication failed. Please check credentials or backend."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-center mb-6">
+          {isLogin ? "Login" : "Create Account"}
+        </h2>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={form.username}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300"
+          />
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300"
+          />
+
+          {!isLogin && (
+            <select
+              name="role"
+              value={form.role}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-lg"
+            >
+              <option value="USER">User</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-2 rounded-lg text-white transition
+              ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}`}
+          >
+            {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
+          </button>
+        </form>
+
+        <p className="text-center text-sm mt-6">
+          {isLogin ? "Don’t have an account?" : "Already have an account?"}
+          <span
+            className="text-blue-600 cursor-pointer ml-1 hover:underline"
+            onClick={() => setIsLogin(!isLogin)}
+          >
+            {isLogin ? " Register" : " Login"}
+          </span>
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default AuthPage;
