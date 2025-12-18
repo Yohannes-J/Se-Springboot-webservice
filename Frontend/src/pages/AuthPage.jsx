@@ -13,12 +13,12 @@ const AuthPage = () => {
 
   const navigate = useNavigate();
 
-  // Handle input changes
+  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Handle form submit
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -32,10 +32,10 @@ const AuthPage = () => {
             username: form.username,
             password: form.password,
           },
-          { withCredentials: true } // if backend uses cookies
+          { withCredentials: true } 
         );
 
-        // Flexible handling of backend response
+        
         const token = res?.data?.token || res?.data?.jwt;
         const user = res?.data?.user || res?.data?.data || { role: "USER" };
 

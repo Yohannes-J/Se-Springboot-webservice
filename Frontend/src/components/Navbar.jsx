@@ -4,10 +4,10 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Remove token or user info from localStorage/sessionStorage
-    localStorage.removeItem("token"); // change key if you use a different one
-    localStorage.removeItem("user");  // optional
-    navigate("/"); // redirect to login page
+    
+    localStorage.removeItem("token"); 
+    localStorage.removeItem("user"); 
+    navigate("/"); 
   };
 
   return (

@@ -23,7 +23,7 @@ export default function Borrow() {
   const authHeaders = () =>
     token ? { Authorization: `Bearer ${token}` } : {};
 
-  // 📅 Due date
+  
   const dueDate = data.days
     ? new Date(
         Date.now() + Number(data.days) * 24 * 60 * 60 * 1000
@@ -51,17 +51,16 @@ export default function Borrow() {
     fetchData();
   }, []);
 
-  // 🔢 Count borrowed copies
+  
   const borrowedCount = (bookId) =>
     borrowed.filter(
       (b) => b.book.id === bookId && !b.isReturned
     ).length;
 
-  // 📦 Available copies
+  
   const availableCopies = (book) =>
     book.totalCopies - borrowedCount(book.id);
 
-  // 🔍 Search logic
   useEffect(() => {
     if (!query.trim()) {
       setResults([]);
@@ -82,7 +81,7 @@ export default function Borrow() {
     setResults(filtered);
   }, [query, books, borrowed]);
 
-  // 📥 Borrow
+  
   const borrowBook = async () => {
     if (!data.userId || !data.bookId) {
       toast.warning("Select user and book!");
