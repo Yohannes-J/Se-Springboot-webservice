@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.wldu.webservices.enities.Book;
 import org.wldu.webservices.enities.BorrowBook;
-import org.wldu.webservices.enities.User;
+import org.wldu.webservices.enities.Customer;
 import org.wldu.webservices.repositories.BookRepository;
 import org.wldu.webservices.repositories.BorrowRepository;
-import org.wldu.webservices.repositories.UserRepository;
+import org.wldu.webservices.repositories.CustomerRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,12 +17,12 @@ import java.util.List;
 public class BorrowService {
 
     private final BorrowRepository borrowRepo;
-    private final UserRepository userRepo;
+    private final CustomerRepository userRepo;
     private final BookRepository bookRepo;
 
     /** Borrow a book */
     public BorrowBook borrowBook(Long userId, Long bookId, int days) {
-        User user = userRepo.findById(userId)
+        Customer user = userRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Book book = bookRepo.findById(bookId)

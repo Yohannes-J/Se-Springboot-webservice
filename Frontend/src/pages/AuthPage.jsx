@@ -13,12 +13,10 @@ const AuthPage = () => {
 
   const navigate = useNavigate();
 
-  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -32,23 +30,25 @@ const AuthPage = () => {
             username: form.username,
             password: form.password,
           },
-          { withCredentials: true } 
+          { withCredentials: true }
         );
 
-        
         const token = res?.data?.token || res?.data?.jwt;
         const user = res?.data?.user || res?.data?.data || { role: "USER" };
 
-        if (!token) {
-          throw new Error("Login failed: no token returned from server");
-        }
+        if (!token) throw new Error("Login failed: no token returned");
 
-        // Save to localStorage
+        // Save token & role
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("role", user.role);
 
         // Redirect by role
-        navigate(user.role === "ADMIN" ? "/home" : "/dashboard");
+        if (user.role === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/dashboard");
+        }
 
       } else {
         // ===== REGISTER =====
@@ -68,11 +68,7 @@ const AuthPage = () => {
       }
     } catch (err) {
       console.error(err);
-      alert(
-        err?.response?.data?.message ||
-          err?.message ||
-          "Authentication failed. Please check credentials or backend."
-      );
+      alert(err?.response?.data?.message || err?.message || "Authentication failed.");
     } finally {
       setLoading(false);
     }

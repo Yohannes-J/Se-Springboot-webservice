@@ -1,0 +1,15 @@
+package org.wldu.webservices.repositories;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.wldu.webservices.enities.Customer;
+
+import java.util.List;
+
+public interface CustomerRepository extends JpaRepository<Customer, Long> {
+
+    boolean existsByEmail(String email);
+
+    List<Customer> findByNameContainingIgnoreCase(String name);
+
+    List<Customer> findByEmailContainingIgnoreCase(String email);
+}

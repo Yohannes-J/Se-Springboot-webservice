@@ -58,7 +58,7 @@ public class SecurityConfig {
                         .requestMatchers("/user/register").permitAll()
                         .requestMatchers("/api/books/list").permitAll()
                         .requestMatchers("/api/books/fetch").permitAll()
-                        .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers("/api/customers/**").permitAll()
 
                         // 🔒 ADMIN only
                         .requestMatchers("/user/delete").hasRole("ADMIN")

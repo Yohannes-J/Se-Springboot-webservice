@@ -23,9 +23,9 @@ public class BorrowBook {
     private Long version;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "customer_id")
     @JsonIgnoreProperties("borrowedBooks")
-    private User user;
+    private Customer user;
 
     @ManyToOne
     @JoinColumn(name = "book_id")

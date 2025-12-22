@@ -38,7 +38,7 @@ public class Book {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "book")
-    @JsonIgnoreProperties({"book", "user"}) // prevent recursion
+    @JsonIgnoreProperties({"book", "customers"})
     private List<BorrowBook> borrowedBooks;
 
     public Book() {

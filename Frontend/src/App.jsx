@@ -8,6 +8,7 @@ import Navbar from "./components/Navbar";
 import ReturnBook from "./pages/RetunBook";
 import AssignRole from "./pages/AssignRole";
 import AdminDashboard from "./pages/AdminDashboard";
+import Penality from "./pages/Penality";
 
 function Layout({ children }) {
   return (
@@ -29,13 +30,15 @@ function AppWrapper() {
   ) : (
     <Layout>
       <Routes>
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/dashboard" element={<Home />} />
         <Route path="/users" element={<Users />} />
         <Route path="/books" element={<Books />} />
         <Route path="/borrow" element={<Borrow />} />
         <Route path="/return" element={<ReturnBook />} />
         <Route path="/assign-role" element={<AssignRole />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/penality" element={<Penality />} />
+        
         <Route path="/404" element={<div>404 Not Found</div>} />
       </Routes>
     </Layout>

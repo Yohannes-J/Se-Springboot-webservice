@@ -1,4 +1,4 @@
-
+import Navbar from "../components/Navbar";
 import libraryHero from "../assets/home.webp";
 import libraryMission from "../assets/library.jpg";
 import libraryVision from "../assets/library3.jpeg";
@@ -6,30 +6,29 @@ import libraryValues from "../assets/library2.jpeg";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen font-sans">
-      
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
       <section
         className="relative flex items-center justify-center bg-cover bg-center h-[500px]"
         style={{ backgroundImage: `url(${libraryHero})` }}
       >
         <div className="absolute inset-0 bg-opacity-50"></div>
         <div className="relative z-10 text-center px-6">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+          <h1 className="text-5xl md:text-6xl font-bold text-black mb-4 drop-shadow-lg ">
             Welcome to Woldia University Digital Library
           </h1>
-          <p className="text-white text-lg md:text-2xl max-w-2xl font-bold mx-auto drop-shadow-md">
+          <p className="text-black text-lg md:text-2xl max-w-2xl font-bold mx-auto drop-shadow-md">
             Explore books, manage borrowings and returns, and track availability with ease.
           </p>
         </div>
       </section>
 
-      
+      {/* Core Principles */}
       <section className="container mx-auto py-16 px-6">
         <h2 className="text-3xl font-bold mb-12 text-center text-gray-800">
           Our Core Principles
         </h2>
         <div className="grid md:grid-cols-3 gap-8">
-         
           <div className="bg-white shadow-lg rounded-xl p-6 hover:scale-105 transition transform duration-300">
             <img
               src={libraryMission}
@@ -42,7 +41,6 @@ export default function Home() {
             </p>
           </div>
 
-       
           <div className="bg-white shadow-lg rounded-xl p-6 hover:scale-105 transition transform duration-300">
             <img
               src={libraryVision}
@@ -55,7 +53,6 @@ export default function Home() {
             </p>
           </div>
 
-         
           <div className="bg-white shadow-lg rounded-xl p-6 hover:scale-105 transition transform duration-300">
             <img
               src={libraryValues}
@@ -70,7 +67,7 @@ export default function Home() {
         </div>
       </section>
 
-     
+      {/* About Section */}
       <section id="about" className="bg-gray-50 py-16 px-6">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold mb-6 text-gray-800">About Our Library</h2>
@@ -80,7 +77,7 @@ export default function Home() {
         </div>
       </section>
 
-     
+      {/* Contact Section */}
       <section id="contact" className="bg-white py-16 px-6">
         <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Contact Us</h2>
         <div className="max-w-3xl mx-auto text-center space-y-3 text-gray-700">
@@ -90,7 +87,7 @@ export default function Home() {
         </div>
       </section>
 
-    
+      {/* Footer */}
       <footer className="bg-blue-600 text-white py-6 mt-auto">
         <div className="container mx-auto text-center">
           &copy; {new Date().getFullYear()} Library Management System. All rights reserved.

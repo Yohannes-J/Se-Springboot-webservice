@@ -4,10 +4,10 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    
-    localStorage.removeItem("token"); 
-    localStorage.removeItem("user"); 
-    navigate("/"); 
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("role");
+    navigate("/");
   };
 
   return (
@@ -21,6 +21,9 @@ export default function Navbar() {
           <Link to="/borrow" className="hover:underline">Borrow</Link>
           <Link to="/return" className="hover:underline">Return</Link>
           <Link to="/assign-role" className="hover:underline">Assign Role</Link>
+          <Link to="/admin" className="hover:underline">Admin</Link>
+          <Link to="/penality" className="hover:underline">Penality</Link>
+
           <button
             onClick={handleLogout}
             className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded text-white"
