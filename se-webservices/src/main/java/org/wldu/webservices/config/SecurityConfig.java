@@ -63,13 +63,18 @@ public class SecurityConfig {
                         // 🔒 ADMIN only
                         .requestMatchers("/user/delete").hasRole("ADMIN")
                         .requestMatchers("/user/update").hasRole("ADMIN")
+                        .requestMatchers("/user/getAllUsers").hasRole("ADMIN")
+
 
                         .requestMatchers("/api/books/addbook").hasRole("ADMIN")
                         .requestMatchers("/api/books/update/**").hasRole("ADMIN")
                         .requestMatchers("/api/books/delete/**").hasRole("ADMIN")
 
-                        .requestMatchers("/api/borrow/**").hasRole("ADMIN")
+                        .requestMatchers("/api/borrow/**").hasAnyRole("ADMIN","LIBRARIAN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/penalities/**").hasRole("ADMIN")
+
+
 
                         // 🔐 everything else
                         .anyRequest().authenticated()

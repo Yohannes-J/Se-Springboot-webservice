@@ -1,4 +1,4 @@
-package org.wldu.webservices.enities;
+package org.wldu.webservices.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
@@ -25,7 +25,7 @@ public class BorrowBook {
     @ManyToOne
     @JoinColumn(name = "customer_id")
     @JsonIgnoreProperties("borrowedBooks")
-    private Customer user;
+    private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "book_id")

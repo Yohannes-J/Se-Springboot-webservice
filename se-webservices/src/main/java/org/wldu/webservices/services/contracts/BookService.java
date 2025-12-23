@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.wldu.webservices.enities.Book;
+import org.wldu.webservices.entities.Book;
 import org.wldu.webservices.repositories.BookRepository;
 
 import java.time.LocalDateTime;

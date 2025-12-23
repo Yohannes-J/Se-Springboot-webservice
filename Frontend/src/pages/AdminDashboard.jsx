@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Customer from "./Customer";
 
 const BASE_URL = "https://localhost:8081";
 
@@ -11,6 +12,7 @@ export default function AdminDashboard() {
     books: 0,
     borrowed: 0,
     returned: 0,
+    customers: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -57,6 +59,7 @@ export default function AdminDashboard() {
         <StatCard title="Total Books" value={stats.books} color="bg-green-500" />
         <StatCard title="Borrowed Books" value={stats.borrowed} color="bg-yellow-500" />
         <StatCard title="Returned Books" value={stats.returned} color="bg-purple-500" />
+        <StatCard title="Total Customers" value={stats.customers} color="bg-red-500" />
       </div>
     </div>
   );

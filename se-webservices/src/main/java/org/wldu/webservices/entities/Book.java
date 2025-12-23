@@ -1,4 +1,4 @@
-package org.wldu.webservices.enities;
+package org.wldu.webservices.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;

@@ -5,44 +5,46 @@ import "react-toastify/dist/ReactToastify.css";
 const BASE_URL = "https://localhost:8081/api";
 
 export default function Borrow() {
-  const [users, setUsers] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [books, setBooks] = useState([]);
   const [borrowed, setBorrowed] = useState([]);
 
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
+  const [bookQuery, setBookQuery] = useState("");
+  const [bookResults, setBookResults] = useState([]);
+  const [customerQuery, setCustomerQuery] = useState("");
+  const [customerResults, setCustomerResults] = useState([]);
 
   const [data, setData] = useState({
-    userId: "",
+    customerId: "",
     bookId: "",
     days: 7,
   });
 
   const token = localStorage.getItem("token");
+  const authHeaders = () => (token ? { Authorization: `Bearer ${token}` } : {});
 
-  const authHeaders = () =>
-    token ? { Authorization: `Bearer ${token}` } : {};
+  const dueDate = new Date(
+    Date.now() + Number(data.days) * 24 * 60 * 60 * 1000
+  ).toLocaleDateString();
 
-  
-  const dueDate = data.days
-    ? new Date(
-        Date.now() + Number(data.days) * 24 * 60 * 60 * 1000
-      ).toLocaleDateString()
-    : "N/A";
-
-  // 🔹 Load data
+  // ================= FETCH DATA =================
   const fetchData = async () => {
     try {
-      const [u, b, br] = await Promise.all([
-        fetch(`${BASE_URL}/users`, { headers: authHeaders() }).then((r) => r.json()),
-        fetch(`${BASE_URL}/books/list`, { headers: authHeaders() }).then((r) => r.json()),
-        fetch(`${BASE_URL}/borrow/all`, { headers: authHeaders() }).then((r) => r.json()),
+      const [cRes, bRes, brRes] = await Promise.all([
+        fetch(`${BASE_URL}/customers`, { headers: authHeaders() }),
+        fetch(`${BASE_URL}/books/list`, { headers: authHeaders() }),
+        fetch(`${BASE_URL}/borrow/all`, { headers: authHeaders() }),
       ]);
 
-      setUsers(u);
-      setBooks(b.data || []);
+      const c = cRes.ok ? await cRes.json() : [];
+      const b = bRes.ok ? await bRes.json() : [];
+      const br = brRes.ok ? await brRes.json() : [];
+
+      setCustomers(c);
+      setBooks(b.data || b);
       setBorrowed(br);
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("Failed to load data!");
     }
   };
@@ -51,45 +53,52 @@ export default function Borrow() {
     fetchData();
   }, []);
 
-  
+  // ================= HELPERS =================
   const borrowedCount = (bookId) =>
-    borrowed.filter(
-      (b) => b.book.id === bookId && !b.isReturned
-    ).length;
+    borrowed.filter((b) => b.book.id === bookId && !b.isReturned).length;
 
-  
-  const availableCopies = (book) =>
-    book.totalCopies - borrowedCount(book.id);
+  const availableCopies = (book) => book.totalCopies - borrowedCount(book.id);
 
+  // ================= BOOK SEARCH =================
   useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      return;
-    }
+    if (!bookQuery.trim()) return setBookResults([]);
+    const q = bookQuery.toLowerCase();
+    setBookResults(
+      books
+        .filter(
+          (b) =>
+            b.title.toLowerCase().includes(q) ||
+            b.author?.toLowerCase().includes(q) ||
+            b.isbn?.toLowerCase().includes(q)
+        )
+        .slice(0, 10)
+    );
+  }, [bookQuery, books, borrowed]);
 
-    const q = query.toLowerCase();
+  // ================= CUSTOMER SEARCH =================
+  useEffect(() => {
+    if (!customerQuery.trim()) return setCustomerResults([]);
+    const q = customerQuery.toLowerCase();
+    setCustomerResults(
+      customers
+        .filter(
+          (c) =>
+            c.name.toLowerCase().includes(q) ||
+            c.email?.toLowerCase().includes(q)
+        )
+        .slice(0, 10)
+    );
+  }, [customerQuery, customers]);
 
-    const filtered = books
-      .filter(
-        (b) =>
-          b.title.toLowerCase().includes(q) ||
-          (b.author && b.author.toLowerCase().includes(q)) ||
-          (b.isbn && b.isbn.toLowerCase().includes(q))
-      )
-      .slice(0, 10);
-
-    setResults(filtered);
-  }, [query, books, borrowed]);
-
-  
+  // ================= BORROW BOOK =================
   const borrowBook = async () => {
-    if (!data.userId || !data.bookId) {
-      toast.warning("Select user and book!");
+    if (!data.customerId || !data.bookId) {
+      toast.warning("Select customer and book!");
       return;
     }
 
     const book = books.find((b) => b.id === data.bookId);
-    if (availableCopies(book) <= 0) {
+    if (!book || availableCopies(book) <= 0) {
       toast.error("No copies available!");
       return;
     }
@@ -98,73 +107,79 @@ export default function Borrow() {
 
     try {
       const res = await fetch(
-        `${BASE_URL}/borrow/borrow?userId=${data.userId}&bookId=${data.bookId}&days=${data.days}`,
+        `${BASE_URL}/borrow/borrow?customerId=${data.customerId}&bookId=${data.bookId}&days=${data.days}`,
         { method: "POST", headers: authHeaders() }
       );
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) throw new Error(`Borrow failed: ${res.status}`);
 
       toast.success("Book borrowed!");
       fetchData();
-
-      setData({ userId: "", bookId: "", days: 7 });
-      setQuery("");
-    } catch {
+      setData({ customerId: "", bookId: "", days: 7 });
+      setCustomerQuery("");
+      setBookQuery("");
+    } catch (err) {
+      console.error(err);
       toast.error("Borrow failed!");
     }
   };
 
+  // ================= UI =================
   return (
     <div className="p-6 max-w-lg mx-auto bg-white shadow-xl rounded-xl">
       <ToastContainer />
-
       <h2 className="text-2xl font-bold mb-4">Borrow Book</h2>
 
-      {/* USER */}
-      <label className="font-medium block mb-1">Select User</label>
-      <select
-        className="border p-2 w-full mb-4 rounded"
-        value={data.userId}
-        onChange={(e) =>
-          setData({ ...data, userId: e.target.value })
-        }
-      >
-        <option value="">Choose user</option>
-        {users.map((u) => (
-          <option key={u.id} value={u.id}>
-            {u.name} ({u.email})
-          </option>
-        ))}
-      </select>
-
-      {/* SEARCH BOOK */}
-      <label className="font-medium block mb-1">Search Book</label>
+      {/* CUSTOMER SEARCH */}
+      <label className="font-medium block mb-1">Search Customer</label>
       <input
-        type="text"
+        className="border p-2 w-full rounded"
+        placeholder="Name or Email"
+        value={customerQuery}
+        onChange={(e) => setCustomerQuery(e.target.value)}
+      />
+      {customerResults.length > 0 && (
+        <div className="border mt-2 rounded max-h-40 overflow-y-auto">
+          {customerResults.map((c) => (
+            <div
+              key={c.id}
+              onClick={() => {
+                setData({ ...data, customerId: c.id });
+                setCustomerQuery(`${c.name} (${c.email})`);
+                setCustomerResults([]);
+              }}
+              className="p-2 border-b cursor-pointer hover:bg-blue-100"
+            >
+              <div className="font-medium">{c.name}</div>
+              <div className="text-sm text-gray-600">{c.email}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* BOOK SEARCH */}
+      <label className="font-medium block mt-4 mb-1">Search Book</label>
+      <input
         className="border p-2 w-full rounded"
         placeholder="Title / Author / ISBN"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        value={bookQuery}
+        onChange={(e) => setBookQuery(e.target.value)}
       />
-
-      {/* RESULTS */}
-      {results.length > 0 && (
+      {bookResults.length > 0 && (
         <div className="border mt-2 rounded max-h-64 overflow-y-auto">
-          {results.map((b) => {
+          {bookResults.map((b) => {
             const available = availableCopies(b);
-            const disabled = available <= 0;
-
             return (
               <div
                 key={b.id}
                 onClick={() => {
-                  if (disabled) return;
+                  if (available <= 0) return;
                   setData({ ...data, bookId: b.id });
-                  setQuery(b.title);
-                  setResults([]);
+                  setBookQuery(b.title);
+                  setBookResults([]);
                 }}
                 className={`p-2 border-b cursor-pointer ${
-                  disabled
+                  available <= 0
                     ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                     : "hover:bg-green-100"
                 }`}
@@ -187,18 +202,14 @@ export default function Borrow() {
       )}
 
       {/* DAYS */}
-      <label className="font-medium block mt-4 mb-1">
-        Borrow Days
-      </label>
+      <label className="font-medium block mt-4 mb-1">Borrow Days</label>
       <input
         type="number"
         min="1"
         max="30"
         className="border p-2 w-full rounded mb-4"
         value={data.days}
-        onChange={(e) =>
-          setData({ ...data, days: e.target.value })
-        }
+        onChange={(e) => setData({ ...data, days: e.target.value })}
       />
 
       {/* DUE DATE */}
@@ -209,9 +220,9 @@ export default function Borrow() {
       {/* BUTTON */}
       <button
         onClick={borrowBook}
-        disabled={!data.userId || !data.bookId}
+        disabled={!data.customerId || !data.bookId}
         className={`w-full py-2 rounded text-white ${
-          !data.userId || !data.bookId
+          !data.customerId || !data.bookId
             ? "bg-gray-400"
             : "bg-green-600 hover:bg-green-700"
         }`}

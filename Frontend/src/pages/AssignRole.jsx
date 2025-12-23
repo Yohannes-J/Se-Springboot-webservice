@@ -3,7 +3,9 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const BASE_URL = "https://localhost:8081";
+const BASE_URL = "https://localhost:8081/api";
+
+const ROLES = ["USER", "ADMIN", "LIBRARIAN"];
 
 export default function AssignRole() {
   const [users, setUsers] = useState([]);
@@ -26,11 +28,14 @@ export default function AssignRole() {
     loadUsers();
   }, []);
 
+  const normalizeRole = (role) =>
+    role?.replace("ROLE_", "") || "USER";
+
   const changeRole = async (userId, role) => {
     try {
       await axios.put(
         `${BASE_URL}/user/assign-role`,
-        { userId, role },
+        { userId, role }, // USER | ADMIN | LIBRARIAN
         { headers }
       );
       toast.success("Role updated");
@@ -56,24 +61,33 @@ export default function AssignRole() {
         </thead>
 
         <tbody>
-          {users.map((u) => (
-            <tr key={u.id}>
-              <td className="border p-2">{u.username}</td>
-              <td className="border p-2 font-medium">{u.role}</td>
-              <td className="border p-2">
-                <select
-                  value={u.role}
-                  onChange={(e) =>
-                    changeRole(u.id, e.target.value)
-                  }
-                  className="border p-1 rounded"
-                >
-                  <option value="USER">USER</option>
-                  <option value="ADMIN">ADMIN</option>
-                </select>
-              </td>
-            </tr>
-          ))}
+          {users.map((u) => {
+            const currentRole = normalizeRole(u.role);
+
+            return (
+              <tr key={u.id}>
+                <td className="border p-2">{u.username}</td>
+                <td className="border p-2 font-medium">
+                  {currentRole}
+                </td>
+                <td className="border p-2">
+                  <select
+                    value={currentRole}
+                    onChange={(e) =>
+                      changeRole(u.id, e.target.value)
+                    }
+                    className="border p-1 rounded"
+                  >
+                    {ROLES.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

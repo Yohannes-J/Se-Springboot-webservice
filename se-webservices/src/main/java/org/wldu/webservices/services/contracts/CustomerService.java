@@ -1,7 +1,7 @@
 package org.wldu.webservices.services.contracts;
 
 import org.springframework.stereotype.Service;
-import org.wldu.webservices.enities.Customer;
+import org.wldu.webservices.entities.Customer;
 import org.wldu.webservices.repositories.CustomerRepository;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class CustomerService {
         }
 
         if (customer.getRole() == null) {
-            customer.setRole("MEMBER");
+            customer.setRole("STUDENT");
         }
 
         return customerRepository.save(customer);

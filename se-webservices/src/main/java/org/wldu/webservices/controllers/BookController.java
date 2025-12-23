@@ -4,8 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.wldu.webservices.enities.Book;
-import org.wldu.webservices.enities.Student;
+import org.wldu.webservices.entities.Book;
 import org.wldu.webservices.services.contracts.BookService;
 
 import java.util.HashMap;

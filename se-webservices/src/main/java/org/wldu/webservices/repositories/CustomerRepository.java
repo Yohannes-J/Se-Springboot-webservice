@@ -1,7 +1,7 @@
 package org.wldu.webservices.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.wldu.webservices.enities.Customer;
+import org.wldu.webservices.entities.Customer;
 
 import java.util.List;
 

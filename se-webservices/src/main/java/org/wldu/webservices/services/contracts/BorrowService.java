@@ -2,9 +2,9 @@ package org.wldu.webservices.services.contracts;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.wldu.webservices.enities.Book;
-import org.wldu.webservices.enities.BorrowBook;
-import org.wldu.webservices.enities.Customer;
+import org.wldu.webservices.entities.Book;
+import org.wldu.webservices.entities.BorrowBook;
+import org.wldu.webservices.entities.Customer;
 import org.wldu.webservices.repositories.BookRepository;
 import org.wldu.webservices.repositories.BorrowRepository;
 import org.wldu.webservices.repositories.CustomerRepository;
@@ -17,13 +17,13 @@ import java.util.List;
 public class BorrowService {
 
     private final BorrowRepository borrowRepo;
-    private final CustomerRepository userRepo;
+    private final CustomerRepository customerRepo;
     private final BookRepository bookRepo;
 
     /** Borrow a book */
-    public BorrowBook borrowBook(Long userId, Long bookId, int days) {
-        Customer user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public BorrowBook borrowBook(Long customerId, Long bookId, int days) {
+        Customer customer = customerRepo.findById(customerId)
+                .orElseThrow(() -> new RuntimeException("Customer not found"));
 
         Book book = bookRepo.findById(bookId)
                 .orElseThrow(() -> new RuntimeException("Book not found"));
@@ -35,7 +35,7 @@ public class BorrowService {
 
         // Create borrow record
         BorrowBook borrow = new BorrowBook();
-        borrow.setUser(user);
+        borrow.setCustomer(customer);
         borrow.setBook(book);
         borrow.setBorrowDate(LocalDateTime.now());
         borrow.setReturnDate(LocalDateTime.now().plusDays(days));
@@ -71,8 +71,8 @@ public class BorrowService {
         return borrowRepo.findAll();
     }
 
-    public List<BorrowBook> getBorrowedBooksByUser(Long userId) {
-        return borrowRepo.findByUserId(userId);
+    public List<BorrowBook> getBorrowedBooksByCustomer(Long customerId) {
+        return borrowRepo.findByCustomerId(customerId);
     }
 
     public List<BorrowBook> getBorrowedBooksByBook(Long bookId) {

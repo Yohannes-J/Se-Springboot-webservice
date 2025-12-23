@@ -1,8 +1,9 @@
 package org.wldu.webservices.controllers;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.wldu.webservices.enities.BorrowBook;
+import org.wldu.webservices.entities.BorrowBook;
 import org.wldu.webservices.services.contracts.BorrowService;
 
 import java.util.List;
@@ -18,13 +19,14 @@ public class BorrowController {
     }
 
     @PostMapping("/borrow")
+    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
     public ResponseEntity<?> borrowBook(
-            @RequestParam Long userId,
+            @RequestParam Long customerId,
             @RequestParam Long bookId,
             @RequestParam(defaultValue = "14") int days
     ) {
         try {
-            return ResponseEntity.ok(borrowService.borrowBook(userId, bookId, days));
+            return ResponseEntity.ok(borrowService.borrowBook(customerId, bookId, days));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(e.getMessage());
         }
@@ -44,9 +46,9 @@ public class BorrowController {
         return ResponseEntity.ok(borrowService.getAllBorrowedBooks());
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<BorrowBook>> getByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(borrowService.getBorrowedBooksByUser(userId));
+    @GetMapping("/customers/{cutomerId}")
+    public ResponseEntity<List<BorrowBook>> getByCustomer(@PathVariable Long customerId) {
+        return ResponseEntity.ok(borrowService.getBorrowedBooksByCustomer(customerId));
     }
 
     @GetMapping("/book/{bookId}")

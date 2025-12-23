@@ -71,7 +71,7 @@ export default function ReturnBook() {
           <table className="min-w-full bg-white border border-gray-200">
             <thead>
               <tr className="bg-gray-100 text-center">
-                <th className="py-2 px-4 border-b">User</th>
+                <th className="py-2 px-4 border-b">Customer</th>
                 <th className="py-2 px-4 border-b">Book</th>
                 <th className="py-2 px-4 border-b">Returned</th>
                 <th className="py-2 px-4 border-b">Borrow Date</th>
@@ -82,7 +82,7 @@ export default function ReturnBook() {
             <tbody>
               {records.map((r) => (
                 <tr key={r.id} className="text-center">
-                  <td className="py-2 px-4 border-b">{r.user?.name || "-"}</td>
+                  <td className="py-2 px-4 border-b">{r.customer?.name || "-"}</td>
                   <td className="py-2 px-4 border-b">{r.book?.title || "-"}</td>
                   <td className="py-2 px-4 border-b">{r.returned ? "Yes" : "No"}</td>
                   <td className="py-2 px-4 border-b">

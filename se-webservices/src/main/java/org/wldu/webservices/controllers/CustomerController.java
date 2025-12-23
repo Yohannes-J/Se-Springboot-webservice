@@ -2,7 +2,7 @@ package org.wldu.webservices.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.wldu.webservices.enities.Customer;
+import org.wldu.webservices.entities.Customer;
 import org.wldu.webservices.services.contracts.CustomerService;
 
 import java.util.List;

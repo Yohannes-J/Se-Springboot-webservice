@@ -25,8 +25,11 @@ public class UsersService {
         Users user = new Users();
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         if (request.getRole() != null && request.getRole().equalsIgnoreCase("ADMIN")) {
             user.setRole("ROLE_ADMIN");
+        } else if (request.getRole() != null && request.getRole().equalsIgnoreCase("LIBRARIAN")) {
+            user.setRole("ROLE_LIBRARIAN");
         } else {
             user.setRole("ROLE_USER");
         }
@@ -44,15 +47,17 @@ public class UsersService {
 
         user.setUsername(request.getUsername());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+
         if (request.getRole() != null && request.getRole().equalsIgnoreCase("ADMIN")) {
             user.setRole("ROLE_ADMIN");
+        } else if (request.getRole() != null && request.getRole().equalsIgnoreCase("LIBRARIAN")) {
+            user.setRole("ROLE_LIBRARIAN");
         } else {
             user.setRole("ROLE_USER");
         }
 
         return userRepository.save(user);
     }
-
 
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
@@ -65,18 +70,20 @@ public class UsersService {
         Users user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!role.equalsIgnoreCase("USER") && !role.equalsIgnoreCase("ADMIN")) {
+        if (!role.equalsIgnoreCase("USER")
+                && !role.equalsIgnoreCase("ADMIN")
+                && !role.equalsIgnoreCase("LIBRARIAN")) {
             throw new RuntimeException("Invalid role");
         }
 
-        // Use ROLE_ prefix for Spring Security
         if (role.equalsIgnoreCase("ADMIN")) {
             user.setRole("ROLE_ADMIN");
+        } else if (role.equalsIgnoreCase("LIBRARIAN")) {
+            user.setRole("ROLE_LIBRARIAN");
         } else {
             user.setRole("ROLE_USER");
         }
 
         userRepository.save(user);
     }
-
 }

@@ -1,4 +1,4 @@
-package org.wldu.webservices.enities;
+package org.wldu.webservices.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,7 +23,7 @@ public class Customer {
     @Column(unique = true, nullable = false)
     private String email;
 
-    private String role = "MEMBER";
+    private String role = "STUDENT";
 
     private LocalDateTime createdAt;
 

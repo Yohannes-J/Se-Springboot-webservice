@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.*;
 import org.wldu.webservices.auths.UsersRepository;
 import org.wldu.webservices.repositories.BookRepository;
 import org.wldu.webservices.repositories.BorrowRepository;
+import org.wldu.webservices.repositories.CustomerRepository;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,14 +18,17 @@ public class AdminDashboardController {
     private final UsersRepository usersRepository;
     private final BookRepository bookRepository;
     private final BorrowRepository borrowRepository;
+    private final CustomerRepository customerRepository;
 
     public AdminDashboardController(
             UsersRepository usersRepository,
             BookRepository bookRepository,
+            CustomerRepository customerRepository,
             BorrowRepository borrowRepository) {
         this.usersRepository = usersRepository;
         this.bookRepository = bookRepository;
         this.borrowRepository = borrowRepository;
+        this.customerRepository=customerRepository;
     }
 
     /**
@@ -32,8 +37,9 @@ public class AdminDashboardController {
     @GetMapping("/dashboard")
     @PreAuthorize("hasRole('ADMIN')") // only accessible by admin
     public ResponseEntity<Map<String, Long>> getStats() {
-        long totalUsers = usersRepository.count(); // total users
-        long totalBooks = bookRepository.count();  // total books
+        long totalUsers = usersRepository.count();
+        long totalBooks = bookRepository.count();
+        long totalCustomers = customerRepository.count();
         long borrowedBooks = borrowRepository.countByReturnedFalse(); // not returned yet
         long returnedBooks = borrowRepository.countByReturnedTrue();  // already returned
 
@@ -42,6 +48,7 @@ public class AdminDashboardController {
         stats.put("books", totalBooks);
         stats.put("borrowed", borrowedBooks);
         stats.put("returned", returnedBooks);
+        stats.put("customers", totalCustomers);
 
         return ResponseEntity.ok(stats);
     }

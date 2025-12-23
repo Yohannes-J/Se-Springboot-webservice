@@ -1,11 +1,20 @@
 import { Navigate } from "react-router-dom";
 
-export default function ProtectedRoute({ children }) {
-  const userRole = localStorage.getItem("role"); // saved on login
+const ProtectedRoute = ({ children, allowedRoles }) => {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
 
-  if (userRole !== "ADMIN") {
-    return <Navigate to="/" replace />; // redirect non-admins to login
+  // Not logged in
+  if (!token) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Role not allowed
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to="/404" replace />;
   }
 
   return children;
-}
+};
+
+export default ProtectedRoute;

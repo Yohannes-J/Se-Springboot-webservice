@@ -7,7 +7,6 @@ const AuthPage = () => {
   const [form, setForm] = useState({
     username: "",
     password: "",
-    role: "USER",
   });
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +22,7 @@ const AuthPage = () => {
 
     try {
       if (isLogin) {
-        // ===== LOGIN =====
+        // ===== LOGIN (UNCHANGED) =====
         const res = await axios.post(
           "https://localhost:8081/auth/login",
           {
@@ -38,12 +37,10 @@ const AuthPage = () => {
 
         if (!token) throw new Error("Login failed: no token returned");
 
-        // Save token & role
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("role", user.role);
 
-        // Redirect by role
         if (user.role === "ADMIN") {
           navigate("/admin");
         } else {
@@ -51,24 +48,27 @@ const AuthPage = () => {
         }
 
       } else {
-        // ===== REGISTER =====
+        // ===== REGISTER (ROLE REMOVED) =====
         await axios.post(
           "https://localhost:8081/user/register",
           {
             username: form.username,
             password: form.password,
-            role: form.role,
           },
           { withCredentials: true }
         );
 
         alert("Account created successfully. Please login.");
-        setForm({ username: "", password: "", role: "USER" });
+        setForm({ username: "", password: "" });
         setIsLogin(true);
       }
     } catch (err) {
       console.error(err);
-      alert(err?.response?.data?.message || err?.message || "Authentication failed.");
+      alert(
+        err?.response?.data?.message ||
+        err?.message ||
+        "Authentication failed."
+      );
     } finally {
       setLoading(false);
     }
@@ -101,18 +101,6 @@ const AuthPage = () => {
             required
             className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300"
           />
-
-          {!isLogin && (
-            <select
-              name="role"
-              value={form.role}
-              onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg"
-            >
-              <option value="USER">User</option>
-              <option value="ADMIN">Admin</option>
-            </select>
-          )}
 
           <button
             type="submit"

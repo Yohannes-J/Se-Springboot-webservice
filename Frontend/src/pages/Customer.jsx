@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function Users() {
+export default function Customer() {
   const [users, setUsers] = useState([]);
-  const [form, setForm] = useState({ name: "", email: "", role: "MEMBER" });
+  const [form, setForm] = useState({ name: "", email: "", role: "STUDENT" });
 
   
   const fetchUsers = async () => {
-    const res = await fetch("https://localhost:8081/api/users");
+    const res = await fetch("https://localhost:8081/api/customers");
     const data = await res.json();
     setUsers(data);
   };
@@ -20,15 +20,15 @@ export default function Users() {
     }
 
     try {
-      const res = await fetch("https://localhost:8081/api/users", {
+      const res = await fetch("https://localhost:8081/api/customers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
 
       if (res.ok) {
-        toast.success("User added successfully! 🎉");
-        setForm({ name: "", email: "", role: "MEMBER" });
+        toast.success("User added successfully!");
+        setForm({ name: "", email: "", role: "STUDENT" });
         fetchUsers();
       } else {
         const msg = await res.text();
@@ -71,7 +71,7 @@ export default function Users() {
           value={form.role}
           onChange={(e) => setForm({ ...form, role: e.target.value })}
         >
-          <option value="MEMBER">Member</option>
+          <option value="STUDENT">STUDENT</option>
           <option value="TEACHER">Teacher</option>
           <option value="LIBRARIAN">Librarian</option>
         </select>
