@@ -1,5 +1,5 @@
 import Navbar from "../components/Navbar";
-import libraryHero from "../assets/home.webp";
+import libraryHero from "../assets/home.jpeg";
 import libraryMission from "../assets/library.jpg";
 import libraryVision from "../assets/library3.jpeg";
 import libraryValues from "../assets/library2.jpeg"; 
@@ -14,10 +14,10 @@ export default function Home() {
       >
         <div className="absolute inset-0 bg-opacity-50"></div>
         <div className="relative z-10 text-center px-6">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 drop-shadow-lg ">
+          <h1 className="text-5xl md:text-6xl font-extrabold  mb-4 drop-shadow-2xl tracking-tight" style={{ color: "#08f44fff" }}>
             Welcome to Woldia University Digital Library
           </h1>
-          <p className="text-white text-lg md:text-2xl max-w-2xl font-bold mx-auto drop-shadow-md">
+          <p className="text-white text-lg md:text-2xl max-w-2xl font-extrabold mx-auto drop-shadow-md">
             Explore books, manage borrowings and returns, and track availability with ease.
           </p>
         </div>

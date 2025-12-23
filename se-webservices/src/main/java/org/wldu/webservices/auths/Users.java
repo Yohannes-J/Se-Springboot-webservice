@@ -1,6 +1,7 @@
 package org.wldu.webservices.auths;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,9 +17,11 @@ public class Users {
     private Long id;
 
     @Column(unique = true, nullable = false)
+
     private String username;
 
     @Column(nullable = false)
+    @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
     @Column(nullable = false)

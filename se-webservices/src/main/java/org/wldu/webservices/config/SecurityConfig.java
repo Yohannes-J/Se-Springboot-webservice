@@ -35,10 +35,9 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-                // 🔥 CONNECT CORS TO SPRING SECURITY
+
                 .cors()
 
-                // 🔐 JWT = no CSRF
                 .and()
                 .csrf(csrf -> csrf.disable())
 
@@ -47,15 +46,15 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                // 🔐 AUTH RULES
+
                 .authorizeHttpRequests(auth -> auth
 
-                        // ✅ allow preflight
+
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // ✅ public
+
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/user/register").permitAll()
+                        .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/books/list").permitAll()
                         .requestMatchers("/api/books/fetch").permitAll()
                         .requestMatchers("/api/customers/**").permitAll()

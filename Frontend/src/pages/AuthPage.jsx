@@ -4,10 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [form, setForm] = useState({
-    username: "",
-    password: "",
-  });
+  const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
@@ -18,17 +15,21 @@ const AuthPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    
+    if (!isLogin && form.password.length < 6) {
+      alert("Password must be at least 6 characters long.");
+      return;
+    }
+
     setLoading(true);
 
     try {
       if (isLogin) {
-        // ===== LOGIN (UNCHANGED) =====
+        // ===== LOGIN =====
         const res = await axios.post(
           "https://localhost:8081/auth/login",
-          {
-            username: form.username,
-            password: form.password,
-          },
+          { username: form.username, password: form.password },
           { withCredentials: true }
         );
 
@@ -41,33 +42,25 @@ const AuthPage = () => {
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("role", user.role);
 
-        if (user.role === "ADMIN") {
-          navigate("/admin");
-        } else {
-          navigate("/dashboard");
-        }
-
+        
+        if (user.role === "ADMIN") navigate("/admin");
+        else navigate("/dashboard");
       } else {
-        // ===== REGISTER (ROLE REMOVED) =====
+        // ===== REGISTER =====
         await axios.post(
-          "https://localhost:8081/user/register",
-          {
-            username: form.username,
-            password: form.password,
-          },
+          "https://localhost:8081/api/user/register",
+          { username: form.username, password: form.password },
           { withCredentials: true }
         );
 
-        alert("Account created successfully. Please login.");
+        alert("Account created successfully! Please login.");
         setForm({ username: "", password: "" });
         setIsLogin(true);
       }
     } catch (err) {
       console.error(err);
       alert(
-        err?.response?.data?.message ||
-        err?.message ||
-        "Authentication failed."
+        err?.response?.data?.message || err?.message || "Authentication failed."
       );
     } finally {
       setLoading(false);
@@ -95,7 +88,7 @@ const AuthPage = () => {
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Password (min 6 chars)"
             value={form.password}
             onChange={handleChange}
             required
@@ -105,8 +98,9 @@ const AuthPage = () => {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2 rounded-lg text-white transition
-              ${loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"}`}
+            className={`w-full py-2 rounded-lg text-white transition ${
+              loading ? "bg-gray-400" : "bg-blue-600 hover:bg-blue-700"
+            }`}
           >
             {loading ? "Please wait..." : isLogin ? "Login" : "Register"}
           </button>
