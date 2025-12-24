@@ -16,7 +16,7 @@ const AuthPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
+    // Basic validation for registration
     if (!isLogin && form.password.length < 6) {
       alert("Password must be at least 6 characters long.");
       return;
@@ -42,8 +42,8 @@ const AuthPage = () => {
         // --- ROLE NORMALIZATION ---
         // Converts "ROLE_ADMIN" to "ADMIN" to match Navbar logic
         const rawRole = userData.role || "USER";
-        const normalizedRole = typeof rawRole === 'string'
-          ? rawRole.replace("ROLE_", "").toUpperCase()
+        const normalizedRole = typeof rawRole === 'string' 
+          ? rawRole.replace("ROLE_", "").toUpperCase() 
           : "USER";
 
         // Save data to LocalStorage
@@ -51,9 +51,15 @@ const AuthPage = () => {
         localStorage.setItem("user", JSON.stringify(userData));
         localStorage.setItem("role", normalizedRole);
 
+        // ===== NAVIGATION LOGIC =====
+        if (normalizedRole === "ADMIN") {
+          navigate("/admin");
+        } else {
+          // Both LIBRARIAN and USER go to dashboard
+          // Navbar will filter the options automatically
+          navigate("/dashboard");
+        }
         
-        if (user.role === "ADMIN") navigate("/admin");
-        else navigate("/dashboard");
       } else {
         // ===== REGISTER =====
         await axios.post(
@@ -67,7 +73,7 @@ const AuthPage = () => {
         setIsLogin(true);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Auth Error:", err);
       alert(
         err?.response?.data?.message || err?.message || "Authentication failed."
       );
@@ -77,22 +83,30 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-center mb-6">
-          {isLogin ? "Login" : "Create Account"}
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-slate-100 font-sans antialiased">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-10 border border-slate-200">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-black text-slate-800 tracking-tight">
+            {isLogin ? "Welcome Back" : "Create Account"}
+          </h2>
+          <p className="text-slate-500 text-sm font-medium mt-2">
+            {isLogin ? "Log in to access the library system" : "Sign up for a new library account"}
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={form.username}
-            onChange={handleChange}
-            required
-            className="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-blue-300"
-          />
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 ml-1 tracking-widest">Username</label>
+            <input
+              type="text"
+              name="username"
+              placeholder="Enter your username"
+              value={form.username}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-sm font-semibold"
+            />
+          </div>
 
           <div>
             <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 ml-1 tracking-widest">Password</label>
@@ -118,15 +132,17 @@ const AuthPage = () => {
           </button>
         </form>
 
-        <p className="text-center text-sm mt-6">
-          {isLogin ? "Don’t have an account?" : "Already have an account?"}
-          <span
-            className="text-blue-600 cursor-pointer ml-1 hover:underline"
-            onClick={() => setIsLogin(!isLogin)}
-          >
-            {isLogin ? " Register" : " Login"}
-          </span>
-        </p>
+        <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+          <p className="text-sm text-slate-500 font-medium">
+            {isLogin ? "New to the system?" : "Already have an account?"}
+            <button
+              className="text-indigo-600 font-bold ml-1.5 hover:underline"
+              onClick={() => setIsLogin(!isLogin)}
+            >
+              {isLogin ? "Register here" : "Login here"}
+            </button>
+          </p>
+        </div>
       </div>
     </div>
   );
