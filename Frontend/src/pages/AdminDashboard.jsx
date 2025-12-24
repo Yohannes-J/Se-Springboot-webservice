@@ -12,6 +12,7 @@ export default function AdminDashboard() {
     books: 0,
     borrowed: 0,
     returned: 0,
+    
     customers: 0,
   });
   const [loading, setLoading] = useState(true);
