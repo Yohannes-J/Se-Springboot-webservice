@@ -45,7 +45,7 @@ export default function Navbar() {
   }, [open]);
 
   return (
-    <header className="bg-slate-900 text-white shadow-xl fixed w-full z-50">
+    <header className="max-h-[calc(50vh-4rem)] bg-slate-900 text-white shadow-xl fixed w-full z-50">
       <div className="container mx-auto flex justify-between items-center h-18 px-6">
         {/* Logo Section */}
         <div className="flex items-center space-x-3">

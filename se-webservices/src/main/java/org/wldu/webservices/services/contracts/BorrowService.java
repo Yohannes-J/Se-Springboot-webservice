@@ -19,7 +19,6 @@ public class BorrowService {
     private final BorrowRepository borrowRepo;
     private final CustomerRepository customerRepo;
     private final BookRepository bookRepo;
-
     /** Borrow a book */
     public BorrowBook borrowBook(Long customerId, Long bookId, int days) {
         Customer customer = customerRepo.findById(customerId)

@@ -60,9 +60,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/customers/**").permitAll()
 
                         // 🔒 ADMIN only
-                        .requestMatchers("/user/delete").hasRole("ADMIN")
-                        .requestMatchers("/user/update").hasRole("ADMIN")
-                        .requestMatchers("/user/getAllUsers").hasRole("ADMIN")
+                        .requestMatchers("/api/user/delete").hasRole("ADMIN")
+                        .requestMatchers("/api/user/update").hasRole("ADMIN")
+                        .requestMatchers("/api/user/getAllUsers").hasRole("ADMIN")
 
 
                         .requestMatchers("/api/books/addbook").hasRole("ADMIN")

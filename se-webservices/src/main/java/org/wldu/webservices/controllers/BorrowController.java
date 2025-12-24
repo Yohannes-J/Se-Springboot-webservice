@@ -46,7 +46,7 @@ public class BorrowController {
         return ResponseEntity.ok(borrowService.getAllBorrowedBooks());
     }
 
-    @GetMapping("/customers/{cutomerId}")
+    @GetMapping("/customers/{customerId}")
     public ResponseEntity<List<BorrowBook>> getByCustomer(@PathVariable Long customerId) {
         return ResponseEntity.ok(borrowService.getBorrowedBooksByCustomer(customerId));
     }
