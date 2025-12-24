@@ -35,51 +35,29 @@ public class SecurityConfig {
     ) throws Exception {
 
         http
-
-                .cors()
-
-                .and()
                 .csrf(csrf -> csrf.disable())
-
-                // 🔐 Stateless
+                .cors(cors -> {})
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
-
-
                 .authorizeHttpRequests(auth -> auth
-
-
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/books/list").permitAll()
                         .requestMatchers("/api/books/fetch").permitAll()
                         .requestMatchers("/api/customers/**").permitAll()
-
-                        // 🔒 ADMIN only
                         .requestMatchers("/api/user/delete").hasRole("ADMIN")
                         .requestMatchers("/api/user/update").hasRole("ADMIN")
                         .requestMatchers("/api/user/getAllUsers").hasRole("ADMIN")
-
-
                         .requestMatchers("/api/books/addbook").hasRole("ADMIN")
                         .requestMatchers("/api/books/update/**").hasRole("ADMIN")
                         .requestMatchers("/api/books/delete/**").hasRole("ADMIN")
-
-                        .requestMatchers("/api/borrow/**").hasAnyRole("ADMIN","LIBRARIAN")
+                        .requestMatchers("/api/borrow/**").hasAnyRole("ADMIN", "LIBRARIAN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/penalities/**").hasRole("ADMIN")
-
-
-
-                        // 🔐 everything else
                         .anyRequest().authenticated()
                 )
-
-                // 🔐 JWT FILTER
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
