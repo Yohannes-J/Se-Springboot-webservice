@@ -105,6 +105,7 @@ public class PenaltyController {
                 penaltyService.getPenaltiesByBorrowBook(borrowBookId)
         );
     }
+
     /* =====================================================
        RESOLVE / UNRESOLVE PENALTY
        (ADMIN OR LIBRARIAN)

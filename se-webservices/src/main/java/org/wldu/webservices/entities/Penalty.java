@@ -82,6 +82,4 @@ public class Penalty {
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
-
-
 }
