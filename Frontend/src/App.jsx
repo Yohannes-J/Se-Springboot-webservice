@@ -11,6 +11,8 @@ import Penality from "./pages/Penalty";
 import Customer from "./pages/Customer";
 import AddBook from "./pages/AddBook";
 
+
+
 // 1. This component checks if the user is logged in
 function ProtectedRoute({ children }) {
   // It looks for the "token" you set during login
