@@ -10,7 +10,12 @@ export default function Books() {
   const [showForm, setShowForm] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const pageSize = 5;
+  const [pageSize, setPageSize] = useState(10);
+
+  // --- ROLE LOGIC ---
+  const rawRole = localStorage.getItem("role") || "USER";
+  const userRole = rawRole.replace("ROLE_", "").toUpperCase();
+  const canManage = userRole === "ADMIN" || userRole === "LIBRARIAN";
 
   const [form, setForm] = useState({
     id: null, title: "", author: "", isbn: "", category: "",
@@ -28,10 +33,10 @@ export default function Books() {
       : { Authorization: `Bearer ${token}` };
   };
 
-  const fetchBooks = async (page = 1) => {
+  const fetchBooks = async (page = 1, size = pageSize) => {
     try {
       const res = await fetch(
-        `${BASE_URL}/list?page=${page - 1}&size=${pageSize}&sortBy=title&sortDir=asc`
+        `${BASE_URL}/list?page=${page - 1}&size=${size}&sortBy=title&sortDir=asc`
       );
       const data = await res.json();
       setBooks(data.data || []);
@@ -42,10 +47,13 @@ export default function Books() {
     }
   };
 
-  useEffect(() => { fetchBooks(); }, []);
+  useEffect(() => { 
+    fetchBooks(1, pageSize); 
+  }, [pageSize]);
 
   const saveBook = async (e) => {
     e.preventDefault();
+    if (!canManage) return toast.error("Unauthorized"); // Security check
     const url = isEditing ? `${BASE_URL}/update/${form.id}` : `${BASE_URL}/addbook`;
     const method = isEditing ? "PUT" : "POST";
     try {
@@ -64,6 +72,7 @@ export default function Books() {
   };
 
   const deleteBook = async (id) => {
+    if (!canManage) return; // Security check
     if (!window.confirm("Delete this record?")) return;
     try {
       const res = await fetch(`${BASE_URL}/${id}`, {
@@ -79,6 +88,7 @@ export default function Books() {
   };
 
   const editBook = (book) => {
+    if (!canManage) return; // Security check
     setForm(book);
     setIsEditing(true);
     setShowForm(true);
@@ -109,11 +119,11 @@ export default function Books() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased overflow-x-hidden">
       <ToastContainer theme="colored" />
 
-      {/* FORM MODAL */}
-      {showForm && (
+      {/* Logic: Only render the form/modal if user canManage */}
+      {showForm && canManage && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={resetForm} />
           <div className="relative w-full max-w-lg bg-white h-full shadow-2xl p-8 overflow-y-auto animate-in slide-in-from-right duration-300">
@@ -121,7 +131,6 @@ export default function Books() {
               <h2 className="text-xl font-black text-slate-800">{isEditing ? "Edit Book" : "New Book"}</h2>
               <button onClick={resetForm} className="text-slate-400 hover:text-slate-600 text-sm font-bold uppercase tracking-widest">Close</button>
             </div>
-            
             <form onSubmit={saveBook} className="space-y-4">
               {[["Title", "title", "text"], ["Author", "author", "text"], ["ISBN", "isbn", "text"], ["Category", "category", "text"]].map(([label, key, type]) => (
                 <div key={key}>
@@ -131,11 +140,9 @@ export default function Books() {
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 outline-none transition-all"
                     value={form[key]}
                     onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                    required={key !== "isbn" && key !== "category"}
                   />
                 </div>
               ))}
-
               <div className="grid grid-cols-3 gap-3">
                 {["publishedYear", "totalCopies", "copiesAvailable"].map((key) => (
                   <div key={key}>
@@ -149,7 +156,6 @@ export default function Books() {
                   </div>
                 ))}
               </div>
-
               <div>
                 <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1">Description</label>
                 <textarea
@@ -158,7 +164,6 @@ export default function Books() {
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                 />
               </div>
-
               <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg">
                 {isEditing ? "Update Database" : "Save Entry"}
               </button>
@@ -167,148 +172,100 @@ export default function Books() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto p-4 md:p-8">
-        <header className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h1 className="text-2xl font-black tracking-tight text-slate-900">Library <span className="text-indigo-600">Inventory</span></h1>
-          <button onClick={() => setShowForm(true)} className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-md">
-            + Add New Book
-          </button>
+      <div className="max-w-7xl mx-auto p-4 md:p-6">
+        <header className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <h1 className="text-xl font-black tracking-tight text-slate-900 uppercase">Inventory <span className="text-indigo-600">Control</span></h1>
+          
+          {/* Logic: Only show Add button if user canManage */}
+          {canManage && (
+            <button onClick={() => setShowForm(true)} className="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-md active:scale-95">
+              + Add Book
+            </button>
+          )}
         </header>
 
-        {/* SEARCH BAR */}
-        <div className="bg-white p-2 border border-slate-200 rounded-xl shadow-sm flex gap-3 mb-6">
-          <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-transparent focus-within:border-indigo-100 focus-within:bg-white transition-all">
-            <input 
-                placeholder="Search Title..." 
-                className="bg-transparent text-sm font-semibold outline-none w-full text-slate-600"
-                value={filters.title}
-                onChange={(e) => setFilters({...filters, title: e.target.value})}
-            />
-          </div>
-          <div className="flex-1 flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-transparent focus-within:border-indigo-100 focus-within:bg-white transition-all">
-            <input 
-                placeholder="Search Author..." 
-                className="bg-transparent text-sm font-semibold outline-none w-full text-slate-600"
-                value={filters.author}
-                onChange={(e) => setFilters({...filters, author: e.target.value})}
-            />
-          </div>
+        <div className="bg-white p-1.5 border border-slate-200 rounded-xl shadow-sm flex gap-2 mb-4">
+          <input 
+              placeholder="Search Title..." 
+              className="flex-1 bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold outline-none border border-transparent focus:border-indigo-200 transition-all"
+              value={filters.title}
+              onChange={(e) => setFilters({...filters, title: e.target.value})}
+          />
+          <input 
+              placeholder="Search Author..." 
+              className="flex-1 bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold outline-none border border-transparent focus:border-indigo-200 transition-all"
+              value={filters.author}
+              onChange={(e) => setFilters({...filters, author: e.target.value})}
+          />
         </div>
 
-        {/* ELEGANT TABLE */}
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-separate border-spacing-0">
+        <div className="bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
+          <div className="w-full overflow-hidden">
+            <table className="w-full text-left border-separate border-spacing-0 table-fixed">
               <thead>
                 <tr className="bg-slate-50/80">
-                  {["Details", "Summary", "Type & ISBN", "Stock", "Actions"].map((h) => (
-                    <th key={h} className="px-6 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">{h}</th>
-                  ))}
+                  <th className="w-[30%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Book Detail</th>
+                  <th className="w-[25%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Summary</th>
+                  <th className="w-[20%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Catagory and ISDN</th>
+                  <th className="w-[15%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Stock Status</th>
+                  {/* Only show Action header if user canManage */}
+                  {canManage && <th className="w-[10%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Actions</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredAndSortedBooks.map((b) => (
-                  <tr 
-                    key={b.id} 
-                    className="group transition-all duration-300 ease-out hover:bg-indigo-50/30 hover:shadow-[inset_4px_0_0_0_#4f46e5] hover:translate-x-1"
-                  >
-                    {/* DETAILS COLUMN (Labeled & Larger) */}
-                    <td className="px-6 py-6 min-w-[320px]">
-                      <div className="flex flex-col gap-2.5">
-                        <div className="flex items-center">
-                          <span className="text-[10px] font-bold text-slate-300 uppercase w-16 flex-shrink-0 tracking-tighter">Title</span>
-                          <span className="font-extrabold text-slate-900 text-lg leading-tight group-hover:text-indigo-700 transition-colors">
-                            {b.title}
-                          </span>
+                  <tr key={b.id} className="group transition-all duration-300 ease-out hover:bg-indigo-50/40 outline-none">
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-0.5 overflow-hidden">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[8px] font-bold text-slate-300 uppercase w-8 flex-shrink-0">Title</span>
+                          <span className="font-bold text-slate-900 text-[13px] truncate block">{b.title}</span>
                         </div>
-                        <div className="flex items-center">
-                          <span className="text-[10px] font-bold text-slate-300 uppercase w-16 flex-shrink-0 tracking-tighter">Author</span>
-                          <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors">
-                            {b.author}
-                          </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[8px] font-bold text-slate-300 uppercase w-8 flex-shrink-0">Author</span>
+                          <span className="text-[11px] font-medium text-slate-500 truncate block">{b.author}</span>
                         </div>
                       </div>
                     </td>
-
-                    {/* SUMMARY */}
-                    <td className="px-6 py-6 max-w-xs">
-                      <p className="text-[13px] text-slate-500 line-clamp-2 italic leading-relaxed font-medium">
-                        {b.description || "No description provided."}
-                      </p>
+                    <td className="px-4 py-3">
+                      <p className="text-[11px] text-slate-400 truncate italic block">{b.description || "No description."}</p>
                     </td>
-
-                    {/* TYPE & ISBN */}
-                    <td className="px-6 py-6">
-                      <div className="flex flex-col gap-1">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-600 uppercase w-fit group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
-                          {b.category || 'General'}
-                        </span>
-                        <span className="text-[11px] font-mono text-slate-400 font-medium">
-                          {b.isbn || 'N/A'}
-                        </span>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-indigo-500 uppercase truncate block">{b.category || 'General'}</span>
+                        <span className="text-[10px] font-mono text-slate-300 truncate block">{b.isbn || 'No-ISBN'}</span>
                       </div>
                     </td>
-
-                    {/* STOCK */}
-                    <td className="px-6 py-6">
-                      <div className="flex flex-col gap-1.5">
-                        <div className="text-sm font-black text-slate-700">
-                          {b.copiesAvailable} <span className="text-slate-300 font-normal">/ {b.totalCopies}</span>
+                    <td className="px-4 py-3">
+                      <span className="text-[11px] font-black text-slate-700">
+                        {b.copiesAvailable}<span className="text-slate-300 font-normal">/{b.totalCopies}</span>
+                      </span>
+                    </td>
+                    
+                    {/* Only show Action buttons if user canManage */}
+                    {canManage && (
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-all">
+                          <button onClick={() => editBook(b)} className="p-2 text-slate-400 hover:text-white hover:bg-indigo-600 rounded-lg">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                          </button>
+                          <button onClick={() => deleteBook(b.id)} className="p-2 text-slate-400 hover:text-white hover:bg-rose-500 rounded-lg">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                          </button>
                         </div>
-                        <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-emerald-500 rounded-full transition-all duration-700" 
-                            style={{ width: `${(b.copiesAvailable / b.totalCopies) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* ACTIONS (Fades in on hover) */}
-                    <td className="px-6 py-6 text-right">
-                      <div className="flex gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 justify-end">
-                        <button 
-                          onClick={() => editBook(b)} 
-                          className="p-2 text-slate-400 hover:text-white hover:bg-indigo-600 rounded-lg transition-all shadow-sm"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                          </svg>
-                        </button>
-                        <button 
-                          onClick={() => deleteBook(b.id)} 
-                          className="p-2 text-slate-400 hover:text-white hover:bg-rose-500 rounded-lg transition-all shadow-sm"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          {/* PAGINATION */}
-          <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Page {currentPage} of {totalPages}</span>
+          <div className="px-6 py-3 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
+            <span className="text-[9px] font-black text-slate-400 uppercase">Page {currentPage} of {totalPages}</span>
             <div className="flex gap-2">
-              <button 
-                disabled={currentPage === 1} 
-                onClick={() => handlePageChange(currentPage - 1)} 
-                className="px-4 py-1.5 text-[10px] font-black uppercase bg-white border border-slate-200 rounded-lg hover:bg-slate-50 disabled:opacity-30 transition-all"
-              >
-                Prev
-              </button>
-              <button 
-                disabled={currentPage === totalPages} 
-                onClick={() => handlePageChange(currentPage + 1)} 
-                className="px-4 py-1.5 text-[10px] font-black uppercase bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-30 transition-all shadow-md shadow-indigo-100"
-              >
-                Next
-              </button>
+              <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)} className="px-3 py-1 text-[9px] font-black uppercase bg-white border border-slate-200 rounded-lg disabled:opacity-20">Prev</button>
+              <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)} className="px-3 py-1 text-[9px] font-black uppercase bg-indigo-600 text-white rounded-lg disabled:opacity-20">Next</button>
             </div>
           </div>
         </div>
