@@ -11,8 +11,6 @@ import Penality from "./pages/Penalty";
 import Customer from "./pages/Customer";
 import AddBook from "./pages/AddBook";
 
-
-
 // 1. This component checks if the user is logged in
 function ProtectedRoute({ children }) {
   // It looks for the "token" you set during login
@@ -25,6 +23,7 @@ function ProtectedRoute({ children }) {
   return children;
 }
 
+// 2. This component wraps the Navbar and spacing for all internal pages
 function Layout({ children }) {
   return (
     <>
@@ -34,22 +33,23 @@ function Layout({ children }) {
   );
 }
 
+// 3. This handles the logic for hiding Navbar and routing permissions
 function AppWrapper() {
   const location = useLocation();
-  const hideNavbar = location.pathname === "/";
 
   return (
     <Routes>
-      {/* Public Route */}
+      {/* Public Route - Login/Register */}
       <Route path="/" element={<AuthPage />} />
 
-      {/* 2. Wrap all private routes inside the ProtectedRoute */}
+      {/* Private Routes - All nested inside ProtectedRoute */}
       <Route
         path="/*"
         element={
           <ProtectedRoute>
             <Layout>
               <Routes>
+                {/* Admin and General Pages */}
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/dashboard" element={<Home />} />
                 <Route path="/customer" element={<Customer />} />
@@ -59,6 +59,8 @@ function AppWrapper() {
                 <Route path="/assign-role" element={<AssignRole />} />
                 <Route path="/penality" element={<Penality />} />
                 <Route path="/books/add" element={<AddBook />} />
+                
+                {/* Catch-all for logged-in users */}
                 <Route path="*" element={<div>404 Not Found</div>} />
               </Routes>
             </Layout>
