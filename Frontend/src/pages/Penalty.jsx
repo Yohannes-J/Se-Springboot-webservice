@@ -6,7 +6,7 @@ const Penality = () => {
   const [loading, setLoading] = useState(false);
 
   const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role"); // ADMIN, LIBRARIAN, USER
+  const role = localStorage.getItem("role"); 
   const headers = { Authorization: `Bearer ${token}` };
 
   const LATE_FINE_PER_DAY = 5;
