@@ -42,9 +42,10 @@ const AuthPage = () => {
         // --- ROLE NORMALIZATION ---
         // Converts "ROLE_ADMIN" to "ADMIN" to match Navbar logic
         const rawRole = userData.role || "USER";
-        const normalizedRole = typeof rawRole === 'string' 
-          ? rawRole.replace("ROLE_", "").toUpperCase() 
-          : "USER";
+        const normalizedRole =
+          typeof rawRole === "string"
+            ? rawRole.replace("ROLE_", "").toUpperCase()
+            : "USER";
 
         // Save data to LocalStorage
         localStorage.setItem("token", token);
@@ -59,7 +60,6 @@ const AuthPage = () => {
           // Navbar will filter the options automatically
           navigate("/dashboard");
         }
-        
       } else {
         // ===== REGISTER =====
         await axios.post(
@@ -90,13 +90,17 @@ const AuthPage = () => {
             {isLogin ? "Welcome Back" : "Create Account"}
           </h2>
           <p className="text-slate-500 text-sm font-medium mt-2">
-            {isLogin ? "Log in to access the library system" : "Sign up for a new library account"}
+            {isLogin
+              ? "Log in to access the library system"
+              : "Sign up for a new library account"}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 ml-1 tracking-widest">Username</label>
+            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 ml-1 tracking-widest">
+              Username
+            </label>
             <input
               type="text"
               name="username"
@@ -109,7 +113,9 @@ const AuthPage = () => {
           </div>
 
           <div>
-            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 ml-1 tracking-widest">Password</label>
+            <label className="block text-[10px] font-black uppercase text-slate-400 mb-1.5 ml-1 tracking-widest">
+              Password
+            </label>
             <input
               type="password"
               name="password"
@@ -125,7 +131,9 @@ const AuthPage = () => {
             type="submit"
             disabled={loading}
             className={`w-full py-3.5 rounded-xl text-white font-bold text-xs uppercase tracking-[0.2em] shadow-lg transition-all active:scale-[0.98] ${
-              loading ? "bg-slate-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200"
+              loading
+                ? "bg-slate-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-200"
             }`}
           >
             {loading ? "Processing..." : isLogin ? "Authorize" : "Register"}
