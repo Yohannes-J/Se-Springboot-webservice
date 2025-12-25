@@ -12,7 +12,6 @@ export default function Books() {
   const [totalPages, setTotalPages] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // --- ROLE LOGIC ---
   const rawRole = localStorage.getItem("role") || "USER";
   const userRole = rawRole.replace("ROLE_", "").toUpperCase();
   const canManage = userRole === "ADMIN" || userRole === "LIBRARIAN";
@@ -21,6 +20,7 @@ export default function Books() {
     id: null, title: "", author: "", isbn: "", category: "",
     publishedYear: new Date().getFullYear(), description: "",
     totalCopies: 1, copiesAvailable: 1,
+    price: 0.0, // <-- ADDED: Default price
   });
 
   const [filters, setFilters] = useState({ title: "", author: "", category: "" });
@@ -53,7 +53,7 @@ export default function Books() {
 
   const saveBook = async (e) => {
     e.preventDefault();
-    if (!canManage) return toast.error("Unauthorized"); // Security check
+    if (!canManage) return toast.error("Unauthorized");
     const url = isEditing ? `${BASE_URL}/update/${form.id}` : `${BASE_URL}/addbook`;
     const method = isEditing ? "PUT" : "POST";
     try {
@@ -72,7 +72,7 @@ export default function Books() {
   };
 
   const deleteBook = async (id) => {
-    if (!canManage) return; // Security check
+    if (!canManage) return;
     if (!window.confirm("Delete this record?")) return;
     try {
       const res = await fetch(`${BASE_URL}/${id}`, {
@@ -88,8 +88,11 @@ export default function Books() {
   };
 
   const editBook = (book) => {
-    if (!canManage) return; // Security check
-    setForm(book);
+    if (!canManage) return;
+    setForm({
+      ...book,
+      price: book.price || 0.0 // <-- Ensure price is handled when editing
+    });
     setIsEditing(true);
     setShowForm(true);
   };
@@ -101,6 +104,7 @@ export default function Books() {
       id: null, title: "", author: "", isbn: "", category: "",
       publishedYear: new Date().getFullYear(), description: "",
       totalCopies: 1, copiesAvailable: 1,
+      price: 0.0, // <-- Reset price
     });
   };
 
@@ -122,7 +126,6 @@ export default function Books() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased overflow-x-hidden">
       <ToastContainer theme="colored" />
 
-      {/* Logic: Only render the form/modal if user canManage */}
       {showForm && canManage && (
         <div className="fixed inset-0 z-50 flex justify-end">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={resetForm} />
@@ -143,8 +146,32 @@ export default function Books() {
                   />
                 </div>
               ))}
-              <div className="grid grid-cols-3 gap-3">
-                {["publishedYear", "totalCopies", "copiesAvailable"].map((key) => (
+              
+              <div className="grid grid-cols-2 gap-3"> {/* Changed grid to 2 for better fit */}
+                {/* ADDED: Price Input Field */}
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1">Replacement Price ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold text-indigo-600 outline-none focus:border-indigo-500 transition-all"
+                    value={form.price}
+                    onChange={(e) => setForm({ ...form, price: parseFloat(e.target.value) || 0 })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1">Published Year</label>
+                  <input
+                    type="number"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm text-slate-700"
+                    value={form.publishedYear}
+                    onChange={(e) => setForm({ ...form, publishedYear: +e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                {["totalCopies", "copiesAvailable"].map((key) => (
                   <div key={key}>
                     <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 truncate">{key.replace(/([A-Z])/g, ' $1')}</label>
                     <input
@@ -156,6 +183,7 @@ export default function Books() {
                   </div>
                 ))}
               </div>
+              
               <div>
                 <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1">Description</label>
                 <textarea
@@ -175,8 +203,6 @@ export default function Books() {
       <div className="max-w-7xl mx-auto p-4 md:p-6">
         <header className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h1 className="text-xl font-black tracking-tight text-slate-900 uppercase">Inventory <span className="text-indigo-600">Control</span></h1>
-          
-          {/* Logic: Only show Add button if user canManage */}
           {canManage && (
             <button onClick={() => setShowForm(true)} className="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-md active:scale-95">
               + Add Book
@@ -191,12 +217,6 @@ export default function Books() {
               value={filters.title}
               onChange={(e) => setFilters({...filters, title: e.target.value})}
           />
-          <input 
-              placeholder="Search Author..." 
-              className="flex-1 bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold outline-none border border-transparent focus:border-indigo-200 transition-all"
-              value={filters.author}
-              onChange={(e) => setFilters({...filters, author: e.target.value})}
-          />
         </div>
 
         <div className="bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden">
@@ -204,11 +224,11 @@ export default function Books() {
             <table className="w-full text-left border-separate border-spacing-0 table-fixed">
               <thead>
                 <tr className="bg-slate-50/80">
-                  <th className="w-[30%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Book Detail</th>
-                  <th className="w-[25%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Summary</th>
-                  <th className="w-[20%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Catagory and ISDN</th>
-                  <th className="w-[15%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Stock Status</th>
-                  {/* Only show Action header if user canManage */}
+                  <th className="w-[25%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Book Detail</th>
+                  <th className="w-[20%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Summary</th>
+                  <th className="w-[15%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-center">Value ($)</th> {/* <-- ADDED: Header */}
+                  <th className="w-[20%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Category & ISBN</th>
+                  <th className="w-[10%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">Stock Status</th>
                   {canManage && <th className="w-[10%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">Actions</th>}
                 </tr>
               </thead>
@@ -230,6 +250,12 @@ export default function Books() {
                     <td className="px-4 py-3">
                       <p className="text-[11px] text-slate-400 truncate italic block">{b.description || "No description."}</p>
                     </td>
+                    {/* ADDED: Display the price in the table */}
+                    <td className="px-4 py-3 text-center">
+                      <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md border border-indigo-100">
+                        ${b.price ? b.price.toFixed(2) : "0.00"}
+                      </span>
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black text-indigo-500 uppercase truncate block">{b.category || 'General'}</span>
@@ -241,15 +267,13 @@ export default function Books() {
                         {b.copiesAvailable}<span className="text-slate-300 font-normal">/{b.totalCopies}</span>
                       </span>
                     </td>
-                    
-                    {/* Only show Action buttons if user canManage */}
                     {canManage && (
                       <td className="px-4 py-3 text-right">
                         <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-all">
-                          <button onClick={() => editBook(b)} className="p-2 text-slate-400 hover:text-white hover:bg-indigo-600 rounded-lg">
+                          <button onClick={() => editBook(b)} className="p-2 text-slate-400 hover:text-white hover:bg-indigo-600 rounded-lg transition-colors">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                           </button>
-                          <button onClick={() => deleteBook(b.id)} className="p-2 text-slate-400 hover:text-white hover:bg-rose-500 rounded-lg">
+                          <button onClick={() => deleteBook(b.id)} className="p-2 text-slate-400 hover:text-white hover:bg-rose-500 rounded-lg transition-colors">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                           </button>
                         </div>
@@ -259,14 +283,6 @@ export default function Books() {
                 ))}
               </tbody>
             </table>
-          </div>
-
-          <div className="px-6 py-3 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-[9px] font-black text-slate-400 uppercase">Page {currentPage} of {totalPages}</span>
-            <div className="flex gap-2">
-              <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)} className="px-3 py-1 text-[9px] font-black uppercase bg-white border border-slate-200 rounded-lg disabled:opacity-20">Prev</button>
-              <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)} className="px-3 py-1 text-[9px] font-black uppercase bg-indigo-600 text-white rounded-lg disabled:opacity-20">Next</button>
-            </div>
           </div>
         </div>
       </div>
