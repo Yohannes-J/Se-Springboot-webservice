@@ -17,7 +17,7 @@ public class Users {
     private Long id;
 
     @Column(unique = true, nullable = false)
-
+    @Size(min = 2, message = "username must be at leat 2 characters")
     private String username;
 
     @Column(nullable = false)
