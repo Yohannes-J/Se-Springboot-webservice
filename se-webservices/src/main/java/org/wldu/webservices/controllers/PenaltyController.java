@@ -8,137 +8,64 @@ import org.wldu.webservices.entities.Penalty;
 import org.wldu.webservices.services.contracts.PenaltyService;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/penalties")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5432", allowCredentials = "true")
 public class PenaltyController {
 
     private final PenaltyService penaltyService;
 
     /* =====================================================
-       CREATE PENALTY (ADMIN ONLY)
+       GET ALL RECORDS
        ===================================================== */
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Penalty> createPenalty(@RequestBody Penalty penalty) {
-        Penalty created = penaltyService.addPenalty(penalty);
-        return ResponseEntity.ok(created);
-    }
-
-    /* =====================================================
-       UPDATE PENALTY (ADMIN ONLY)
-       ===================================================== */
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Penalty> updatePenalty(
-            @PathVariable Long id,
-            @RequestBody Penalty penalty) {
-
-        Penalty updated = penaltyService.updatePenalty(id, penalty);
-        return ResponseEntity.ok(updated);
-    }
-
-    /* =====================================================
-       DELETE PENALTY (ADMIN ONLY)
-       ===================================================== */
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Void> deletePenalty(@PathVariable Long id) {
-        penaltyService.deletePenalty(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    /* =====================================================
-       GET PENALTY BY ID
-       ===================================================== */
-    @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Penalty> getPenaltyById(@PathVariable Long id) {
-        return ResponseEntity.ok(penaltyService.getPenalty(id));
-    }
-
-    /* =====================================================
-       GET ALL PENALTIES
-       ===================================================== */
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Penalty>> getAllPenalties() {
         return ResponseEntity.ok(penaltyService.getAllPenalties());
     }
 
     /* =====================================================
-       GET PENALTIES BY CUSTOMER
+       UPSERT BY BORROW ID (THE MISSING LINK)
+       This allows your React code to update the Penalty table
+       even if the record doesn't exist yet for a specific borrow.
        ===================================================== */
-    @GetMapping("/customer/{customerId}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<Penalty>> getPenaltiesByCustomer(
-            @PathVariable Long customerId) {
+    @PutMapping("/upsert-by-borrow/{borrowId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
+    public ResponseEntity<Penalty> upsertByBorrow(
+            @PathVariable Long borrowId,
+            @RequestBody Map<String, Object> updates) {
 
-        return ResponseEntity.ok(
-                penaltyService.getPenaltiesByCustomer(customerId)
-        );
+        // This method will find the penalty linked to the borrowId,
+        // or create it if it's the first time an admin is adding a fine.
+        Penalty updated = penaltyService.createOrUpdateFromBorrow(borrowId, updates);
+        return ResponseEntity.ok(updated);
     }
 
     /* =====================================================
-       GET PENALTIES BY BOOK
+       STANDARD UPDATE (By Penalty ID)
        ===================================================== */
-    @GetMapping("/book/{bookId}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<Penalty>> getPenaltiesByBook(
-            @PathVariable Long bookId) {
-
-        return ResponseEntity.ok(
-                penaltyService.getPenaltiesByBook(bookId)
-        );
-    }
-
-    /* =====================================================
-       GET PENALTIES BY BORROW RECORD
-       ===================================================== */
-    @GetMapping("/borrow/{borrowBookId}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<Penalty>> getPenaltiesByBorrowBook(
-            @PathVariable Long borrowBookId) {
-
-        return ResponseEntity.ok(
-                penaltyService.getPenaltiesByBorrowBook(borrowBookId)
-        );
-    }
-
-    /* =====================================================
-       RESOLVE / UNRESOLVE PENALTY
-       (ADMIN OR LIBRARIAN)
-       ===================================================== */
-    @PutMapping("/{id}/resolve")
-    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
-    public ResponseEntity<Penalty> resolvePenalty(
+    @PutMapping("/update/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'LIBRARIAN')")
+    public ResponseEntity<Penalty> updatePenaltyField(
             @PathVariable Long id,
-            @RequestParam boolean resolved) {
-
-        Penalty penalty = penaltyService.getPenalty(id);
-        penalty.setResolved(resolved);
-
-        return ResponseEntity.ok(
-                penaltyService.updatePenalty(id, penalty)
-        );
+            @RequestBody Map<String, Object> updates) {
+        Penalty updated = penaltyService.partialUpdate(id, updates);
+        return ResponseEntity.ok(updated);
     }
 
-    /* =====================================================
-       MARK PENALTY AS PAID
-       (ADMIN OR LIBRARIAN)
-       ===================================================== */
-    @PutMapping("/{id}/paid")
-    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
-    public ResponseEntity<Penalty> markPenaltyPaid(
-            @PathVariable Long id,
-            @RequestParam boolean paid) {
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Penalty> getPenaltyById(@PathVariable Long id) {
+        return ResponseEntity.ok(penaltyService.getPenalty(id));
+    }
 
-        Penalty penalty = penaltyService.getPenalty(id);
-        penalty.setPaid(paid);
-
-        return ResponseEntity.ok(
-                penaltyService.updatePenalty(id, penalty)
-        );
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deletePenalty(@PathVariable Long id) {
+        penaltyService.deletePenalty(id);
+        return ResponseEntity.noContent().build();
     }
 }
