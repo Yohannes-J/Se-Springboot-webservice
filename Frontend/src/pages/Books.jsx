@@ -18,12 +18,22 @@ export default function Books() {
   const canManage = userRole === "ADMIN" || userRole === "LIBRARIAN";
 
   const [form, setForm] = useState({
-    id: null, title: "", author: "", isbn: "", category: "",
-    publishedYear: new Date().getFullYear(), description: "",
-    totalCopies: 1, copiesAvailable: 1,
+    id: null,
+    title: "",
+    author: "",
+    isbn: "",
+    category: "",
+    publishedYear: new Date().getFullYear(),
+    description: "",
+    totalCopies: 1,
+    copiesAvailable: 1,
   });
 
-  const [filters, setFilters] = useState({ title: "", author: "", category: "" });
+  const [filters, setFilters] = useState({
+    title: "",
+    author: "",
+    category: "",
+  });
 
   const authHeaders = (json = true) => {
     const token = localStorage.getItem("token");
@@ -36,7 +46,9 @@ export default function Books() {
   const fetchBooks = async (page = 1, size = pageSize) => {
     try {
       const res = await fetch(
-        `${BASE_URL}/list?page=${page - 1}&size=${size}&sortBy=title&sortDir=asc`
+        `${BASE_URL}/list?page=${
+          page - 1
+        }&size=${size}&sortBy=title&sortDir=asc`
       );
       const data = await res.json();
       setBooks(data.data || []);
@@ -47,14 +59,16 @@ export default function Books() {
     }
   };
 
-  useEffect(() => { 
-    fetchBooks(1, pageSize); 
+  useEffect(() => {
+    fetchBooks(1, pageSize);
   }, [pageSize]);
 
   const saveBook = async (e) => {
     e.preventDefault();
     if (!canManage) return toast.error("Unauthorized"); // Security check
-    const url = isEditing ? `${BASE_URL}/update/${form.id}` : `${BASE_URL}/addbook`;
+    const url = isEditing
+      ? `${BASE_URL}/update/${form.id}`
+      : `${BASE_URL}/addbook`;
     const method = isEditing ? "PUT" : "POST";
     try {
       const res = await fetch(url, {
@@ -98,9 +112,15 @@ export default function Books() {
     setIsEditing(false);
     setShowForm(false);
     setForm({
-      id: null, title: "", author: "", isbn: "", category: "",
-      publishedYear: new Date().getFullYear(), description: "",
-      totalCopies: 1, copiesAvailable: 1,
+      id: null,
+      title: "",
+      author: "",
+      isbn: "",
+      category: "",
+      publishedYear: new Date().getFullYear(),
+      description: "",
+      totalCopies: 1,
+      copiesAvailable: 1,
     });
   };
 
@@ -125,43 +145,72 @@ export default function Books() {
       {/* Logic: Only render the form/modal if user canManage */}
       {showForm && canManage && (
         <div className="fixed inset-0 z-50 flex justify-end">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={resetForm} />
+          <div
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            onClick={resetForm}
+          />
           <div className="relative w-full max-w-lg bg-white h-full shadow-2xl p-8 overflow-y-auto animate-in slide-in-from-right duration-300">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-black text-slate-800">{isEditing ? "Edit Book" : "New Book"}</h2>
-              <button onClick={resetForm} className="text-slate-400 hover:text-slate-600 text-sm font-bold uppercase tracking-widest">Close</button>
+              <h2 className="text-xl font-black text-slate-800">
+                {isEditing ? "Edit Book" : "New Book"}
+              </h2>
+              <button
+                onClick={resetForm}
+                className="text-slate-400 hover:text-slate-600 text-sm font-bold uppercase tracking-widest"
+              >
+                Close
+              </button>
             </div>
             <form onSubmit={saveBook} className="space-y-4">
-              {[["Title", "title", "text"], ["Author", "author", "text"], ["ISBN", "isbn", "text"], ["Category", "category", "text"]].map(([label, key, type]) => (
+              {[
+                ["Title", "title", "text"],
+                ["Author", "author", "text"],
+                ["ISBN", "isbn", "text"],
+                ["Category", "category", "text"],
+              ].map(([label, key, type]) => (
                 <div key={key}>
-                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1">{label}</label>
+                  <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1">
+                    {label}
+                  </label>
                   <input
                     type={type}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm focus:border-indigo-500 outline-none transition-all"
                     value={form[key]}
-                    onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, [key]: e.target.value })
+                    }
                   />
                 </div>
               ))}
               <div className="grid grid-cols-3 gap-3">
-                {["publishedYear", "totalCopies", "copiesAvailable"].map((key) => (
-                  <div key={key}>
-                    <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 truncate">{key.replace(/([A-Z])/g, ' $1')}</label>
-                    <input
-                      type="number"
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 text-center text-sm font-bold text-slate-700"
-                      value={form[key]}
-                      onChange={(e) => setForm({ ...form, [key]: +e.target.value })}
-                    />
-                  </div>
-                ))}
+                {["publishedYear", "totalCopies", "copiesAvailable"].map(
+                  (key) => (
+                    <div key={key}>
+                      <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 truncate">
+                        {key.replace(/([A-Z])/g, " $1")}
+                      </label>
+                      <input
+                        type="number"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2 text-center text-sm font-bold text-slate-700"
+                        value={form[key]}
+                        onChange={(e) =>
+                          setForm({ ...form, [key]: +e.target.value })
+                        }
+                      />
+                    </div>
+                  )
+                )}
               </div>
               <div>
-                <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1">Description</label>
+                <label className="block text-[10px] font-bold uppercase text-slate-400 mb-1 ml-1">
+                  Description
+                </label>
                 <textarea
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm h-32 resize-none outline-none focus:border-indigo-500"
                   value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
                 />
               </div>
               <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg">
@@ -174,28 +223,33 @@ export default function Books() {
 
       <div className="max-w-7xl mx-auto p-4 md:p-6">
         <header className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h1 className="text-xl font-black tracking-tight text-slate-900 uppercase">Inventory <span className="text-indigo-600">Control</span></h1>
-          
+          <h1 className="text-xl font-black tracking-tight text-slate-900 uppercase">
+            Books <span className="text-indigo-600">Store</span>
+          </h1>
+
           {/* Logic: Only show Add button if user canManage */}
           {canManage && (
-            <button onClick={() => setShowForm(true)} className="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-md active:scale-95">
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-indigo-600 text-white px-5 py-2 rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-indigo-700 transition-all shadow-md active:scale-95"
+            >
               + Add Book
             </button>
           )}
         </header>
 
         <div className="bg-white p-1.5 border border-slate-200 rounded-xl shadow-sm flex gap-2 mb-4">
-          <input 
-              placeholder="Search Title..." 
-              className="flex-1 bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold outline-none border border-transparent focus:border-indigo-200 transition-all"
-              value={filters.title}
-              onChange={(e) => setFilters({...filters, title: e.target.value})}
+          <input
+            placeholder="Search Title..."
+            className="flex-1 bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold outline-none border border-transparent focus:border-indigo-200 transition-all"
+            value={filters.title}
+            onChange={(e) => setFilters({ ...filters, title: e.target.value })}
           />
-          <input 
-              placeholder="Search Author..." 
-              className="flex-1 bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold outline-none border border-transparent focus:border-indigo-200 transition-all"
-              value={filters.author}
-              onChange={(e) => setFilters({...filters, author: e.target.value})}
+          <input
+            placeholder="Search Author..."
+            className="flex-1 bg-slate-50 px-3 py-1.5 rounded-lg text-xs font-semibold outline-none border border-transparent focus:border-indigo-200 transition-all"
+            value={filters.author}
+            onChange={(e) => setFilters({ ...filters, author: e.target.value })}
           />
         </div>
 
@@ -204,53 +258,154 @@ export default function Books() {
             <table className="w-full text-left border-separate border-spacing-0 table-fixed">
               <thead>
                 <tr className="bg-slate-50/80">
+<<<<<<< Updated upstream
                   <th className="w-[30%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-800">Book Detail</th>
                   <th className="w-[25%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-800">Summary</th>
                   <th className="w-[20%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-800">Catagory and ISDN</th>
                   <th className="w-[15%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-800">Stock Status</th>
                   {/* Only show Action header if user canManage */}
                   {canManage && <th className="w-[10%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-800 text-right">Actions</th>}
+=======
+                  <th className="w-[30%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                    Book Detail
+                  </th>
+                  <th className="w-[25%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                    Summary
+                  </th>
+                  <th className="w-[20%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                    Catagory and ISDN
+                  </th>
+                  <th className="w-[15%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                    Stock Status
+                  </th>
+                  {/* Only show Action header if user canManage */}
+                  {canManage && (
+                    <th className="w-[10%] px-4 py-3 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 text-right">
+                      Actions
+                    </th>
+                  )}
+>>>>>>> Stashed changes
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {filteredAndSortedBooks.map((b) => (
-                  <tr key={b.id} className="group transition-all duration-300 ease-out hover:bg-indigo-50/40 outline-none">
+                  <tr
+                    key={b.id}
+                    className="group transition-all duration-300 ease-out hover:bg-indigo-50/40 outline-none"
+                  >
                     <td className="px-4 py-3">
                       <div className="flex flex-col gap-0.5 overflow-hidden">
                         <div className="flex items-center gap-2">
+<<<<<<< Updated upstream
                           <span className="text-[10px] font-bold text-slate-800 uppercase w-8 flex-shrink-0">Title</span>
                           <span className="font-bold text-slate-900 text-[13px] truncate block">{b.title}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-[8px] font-bold text-slate-800 uppercase w-8 flex-shrink-0">Author</span>
                           <span className="text-[11px] font-medium text-slate-500 truncate block">{b.author}</span>
+=======
+                          <span className="text-[8px] font-bold text-slate-300 uppercase w-8 flex-shrink-0">
+                            Title
+                          </span>
+                          <span className="font-bold text-slate-900 text-[13px] truncate block">
+                            {b.title}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[8px] font-bold text-slate-300 uppercase w-8 flex-shrink-0">
+                            Author
+                          </span>
+                          <span className="text-[11px] font-medium text-slate-500 truncate block">
+                            {b.author}
+                          </span>
+>>>>>>> Stashed changes
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
+<<<<<<< Updated upstream
                       <p className="text-[11px] text-slate-800 truncate italic block">{b.description || "No description."}</p>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-black text-indigo-600 uppercase truncate block">{b.category || 'General'}</span>
                         <span className="text-[10px] font-mono text-slate-800 truncate block">{b.isbn || 'No-ISBN'}</span>
+=======
+                      <p className="text-[11px] text-slate-400 truncate italic block">
+                        {b.description || "No description."}
+                      </p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-black text-indigo-500 uppercase truncate block">
+                          {b.category || "General"}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-300 truncate block">
+                          {b.isbn || "No-ISBN"}
+                        </span>
+>>>>>>> Stashed changes
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <span className="text-[11px] font-black text-slate-700">
+<<<<<<< Updated upstream
                         {b.copiesAvailable}<span className="text-slate-800 font-normal">/{b.totalCopies}</span>
+=======
+                        {b.copiesAvailable}
+                        <span className="text-slate-300 font-normal">
+                          /{b.totalCopies}
+                        </span>
+>>>>>>> Stashed changes
                       </span>
                     </td>
-                    
+
                     {/* Only show Action buttons if user canManage */}
                     {canManage && (
                       <td className="px-4 py-3 text-right">
                         <div className="flex gap-2 justify-end opacity-0 group-hover:opacity-100 transition-all">
+<<<<<<< Updated upstream
                           <button onClick={() => editBook(b)} className="p-2 text-slate-800 hover:text-white hover:bg-indigo-600 rounded-lg">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                           </button>
                           <button onClick={() => deleteBook(b.id)} className="p-2 text-slate-800 hover:text-white hover:bg-rose-500 rounded-lg">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+=======
+                          <button
+                            onClick={() => editBook(b)}
+                            className="p-2 text-slate-400 hover:text-white hover:bg-indigo-600 rounded-lg"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2.5"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                              />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => deleteBook(b.id)}
+                            className="p-2 text-slate-400 hover:text-white hover:bg-rose-500 rounded-lg"
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2.5"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                              />
+                            </svg>
+>>>>>>> Stashed changes
                           </button>
                         </div>
                       </td>
@@ -262,10 +417,24 @@ export default function Books() {
           </div>
 
           <div className="px-6 py-3 bg-slate-50/50 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-[9px] font-black text-slate-400 uppercase">Page {currentPage} of {totalPages}</span>
+            <span className="text-[9px] font-black text-slate-400 uppercase">
+              Page {currentPage} of {totalPages}
+            </span>
             <div className="flex gap-2">
-              <button disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)} className="px-3 py-1 text-[9px] font-black uppercase bg-white border border-slate-200 rounded-lg disabled:opacity-20">Prev</button>
-              <button disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)} className="px-3 py-1 text-[9px] font-black uppercase bg-indigo-600 text-white rounded-lg disabled:opacity-20">Next</button>
+              <button
+                disabled={currentPage === 1}
+                onClick={() => handlePageChange(currentPage - 1)}
+                className="px-3 py-1 text-[9px] font-black uppercase bg-white border border-slate-200 rounded-lg disabled:opacity-20"
+              >
+                Prev
+              </button>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => handlePageChange(currentPage + 1)}
+                className="px-3 py-1 text-[9px] font-black uppercase bg-indigo-600 text-white rounded-lg disabled:opacity-20"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>

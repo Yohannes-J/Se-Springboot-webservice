@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom"; // 1. Import the hook
 import libraryHero from "../assets/home.jpeg";
 import libraryMission from "../assets/library.jpg";
 import libraryVision from "../assets/library3.jpeg";
-import libraryValues from "../assets/library2.jpeg";  
+import libraryValues from "../assets/library2.jpeg";
 
 export default function Home() {
   const navigate = useNavigate(); // 2. Initialize the navigate function
@@ -28,34 +28,41 @@ export default function Home() {
         style={{ backgroundImage: `url(${libraryHero})` }}
       >
         {/* Modern Glassmorphism Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70 backdrop-blur-[2px]"></div>
-        
+        <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/40 to-black/70 backdrop-blur-[2px]"></div>
+
         <div className="relative z-10 text-center px-6 max-w-5xl animate-fade-in">
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-2xl">
-            Woldia University <br/>
+            Woldia University <br />
             <span className="text-blue-400">Digital Library</span>
           </h1>
           <p className="text-gray-100 text-lg md:text-2xl mb-10 leading-relaxed font-light max-w-3xl mx-auto drop-shadow-md">
-            Your gateway to a world of knowledge. Explore thousands of resources, 
-            track your borrowings, and innovate with ease.
+            Your gateway to a world of knowledge. Explore thousands of
+            resources, track your borrowings, and innovate with ease.
           </p>
-          
+
           {/* Beautiful "Books" Button */}
           <div className="flex justify-center">
-            <button 
+            <button
               onClick={() => navigate("/books")} // 3. Added the click handler
               className="relative group overflow-hidden px-14 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white rounded-full font-bold text-xl transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_35px_rgba(37,99,235,0.6)] hover:-translate-y-1 active:scale-95"
             >
               {/* Shimmer Effect Layer */}
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer"></span>
-              
+
               <span className="relative flex items-center gap-3">
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className="h-7 w-7 transition-transform group-hover:rotate-12" 
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-7 w-7 transition-transform group-hover:rotate-12"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                  />
                 </svg>
                 Books
               </span>
@@ -68,23 +75,48 @@ export default function Home() {
       <section className="bg-white py-24 px-6">
         <div className="container mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">Our Core Principles</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+              Our Core Principles
+            </h2>
             <div className="h-1.5 w-24 bg-blue-600 mx-auto rounded-full"></div>
           </div>
-          
+
           <div className="grid md:grid-cols-3 gap-10">
             {[
-              { img: libraryMission, title: "Our Mission", text: "To provide students and faculty with easy access to digital resources, supporting research and learning across all disciplines." },
-              { img: libraryVision, title: "Our Vision", text: "To become a leading digital library in Ethiopia, empowering knowledge discovery and innovation for all researchers." },
-              { img: libraryValues, title: "Our Values", text: "Accessibility, Integrity, Excellence, and Innovation guide our library services and support student success." }
+              {
+                img: libraryMission,
+                title: "Our Mission",
+                text: "To provide students and faculty with easy access to digital resources, supporting research and learning across all disciplines.",
+              },
+              {
+                img: libraryVision,
+                title: "Our Vision",
+                text: "To become a leading digital library in Ethiopia, empowering knowledge discovery and innovation for all researchers.",
+              },
+              {
+                img: libraryValues,
+                title: "Our Values",
+                text: "Accessibility, Integrity, Excellence, and Innovation guide our library services and support student success.",
+              },
             ].map((item, index) => (
-              <div key={index} className="group bg-white border border-gray-100 shadow-xl shadow-gray-200/50 rounded-2xl overflow-hidden hover:-translate-y-2 transition-all duration-500">
+              <div
+                key={index}
+                className="group bg-white border border-gray-100 shadow-xl shadow-gray-200/50 rounded-2xl overflow-hidden hover:-translate-y-2 transition-all duration-500"
+              >
                 <div className="overflow-hidden">
-                   <img src={item.img} alt={item.title} className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <img
+                    src={item.img}
+                    alt={item.title}
+                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-700"
+                  />
                 </div>
                 <div className="p-8">
-                  <h3 className="text-2xl font-bold mb-4 text-gray-800">{item.title}</h3>
-                  <p className="text-gray-600 leading-relaxed text-lg">{item.text}</p>
+                  <h3 className="text-2xl font-bold mb-4 text-gray-800">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed text-lg">
+                    {item.text}
+                  </p>
                 </div>
               </div>
             ))}
@@ -93,13 +125,25 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="bg-slate-50 py-28 px-6 border-y border-gray-200">
+      <section
+        id="about"
+        className="bg-slate-50 py-28 px-6 border-y border-gray-200"
+      >
         <div className="container mx-auto max-w-4xl text-center">
-          <span className="text-blue-600 font-bold tracking-[0.2em] uppercase text-sm mb-4 block">Knowledge Hub</span>
-          <h2 className="text-4xl md:text-5xl font-bold mb-8 text-gray-900 tracking-tight">About Our Library</h2>
+          <span className="text-blue-600 font-bold tracking-[0.2em] uppercase text-sm mb-4 block">
+            Knowledge Hub
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold mb-8 text-gray-900 tracking-tight">
+            About Our Library
+          </h2>
           <p className="text-gray-600 text-xl leading-relaxed font-light">
-            Our Library Management System allows users to explore books easily, manage borrowings and returns, and track availability in real-time. 
-            Whether you’re a student, teacher, or book lover, we provide a <span className="text-blue-600 font-semibold italic">seamless digital experience</span> to access the world's knowledge.
+            Our Library Management System allows users to explore books easily,
+            manage borrowings and returns, and track availability in real-time.
+            Whether you’re a student, teacher, or book lover, we provide a{" "}
+            <span className="text-blue-600 font-semibold italic">
+              seamless digital experience
+            </span>{" "}
+            to access the world's knowledge.
           </p>
         </div>
       </section>
@@ -108,19 +152,29 @@ export default function Home() {
       <section id="contact" className="bg-white py-24 px-6">
         <div className="container mx-auto max-w-5xl">
           <div className="bg-blue-950 rounded-[3rem] p-12 md:p-20 text-white flex flex-col items-center text-center shadow-2xl shadow-blue-900/30">
-            <h2 className="text-4xl md:text-5xl font-bold mb-10 tracking-tight">Get In Touch</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-10 tracking-tight">
+              Get In Touch
+            </h2>
             <div className="grid md:grid-cols-3 gap-12 w-full">
               <div className="space-y-3">
-                <p className="text-blue-400 font-semibold tracking-widest uppercase text-xs">Email Us</p>
+                <p className="text-blue-400 font-semibold tracking-widest uppercase text-xs">
+                  Email Us
+                </p>
                 <p className="text-lg font-medium">Digitallibrary@gmail.com</p>
               </div>
               <div className="space-y-3">
-                <p className="text-blue-400 font-semibold tracking-widest uppercase text-xs">Call Us</p>
+                <p className="text-blue-400 font-semibold tracking-widest uppercase text-xs">
+                  Call Us
+                </p>
                 <p className="text-lg font-medium">+251 924-16-49-94</p>
               </div>
               <div className="space-y-3">
-                <p className="text-blue-400 font-semibold tracking-widest uppercase text-xs">Visit Us</p>
-                <p className="text-lg font-medium">Woldia University, Ethiopia</p>
+                <p className="text-blue-400 font-semibold tracking-widest uppercase text-xs">
+                  Visit Us
+                </p>
+                <p className="text-lg font-medium">
+                  Woldia University, Ethiopia
+                </p>
               </div>
             </div>
           </div>
@@ -131,13 +185,33 @@ export default function Home() {
       <footer className="bg-gray-950 text-gray-500 py-16 mt-auto border-t border-gray-900">
         <div className="container mx-auto px-6 text-center">
           <div className="mb-8">
-             <h2 className="text-white text-3xl font-black italic tracking-tighter">WOLDIA <span className="text-blue-600">DIGITAL</span></h2>
+            <h2 className="text-white text-3xl font-black italic tracking-tighter">
+              WOLDIA <span className="text-blue-600">DIGITAL</span>
+            </h2>
           </div>
-          <p className="mb-6 text-sm">© {new Date().getFullYear()} Library Management System. Crafted for Excellence.</p>
+          <p className="mb-6 text-sm">
+            © {new Date().getFullYear()} Library Management System. Crafted for
+            Excellence.
+          </p>
           <div className="flex justify-center gap-8 text-sm font-medium">
-            <a href="#" className="hover:text-white transition-colors duration-300">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors duration-300">Terms of Service</a>
-            <a href="#" className="hover:text-white transition-colors duration-300">Support</a>
+            <a
+              href="#"
+              className="hover:text-white transition-colors duration-300"
+            >
+              Privacy Policy
+            </a>
+            <a
+              href="#"
+              className="hover:text-white transition-colors duration-300"
+            >
+              Terms of Service
+            </a>
+            <a
+              href="#"
+              className="hover:text-white transition-colors duration-300"
+            >
+              Support
+            </a>
           </div>
         </div>
       </footer>

@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/books/delete/**").hasRole("ADMIN")
                         .requestMatchers("/api/borrow/**").hasAnyRole("ADMIN", "LIBRARIAN")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/penalities/**").hasRole("ADMIN")
+                        .requestMatchers("/api/penalties/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
