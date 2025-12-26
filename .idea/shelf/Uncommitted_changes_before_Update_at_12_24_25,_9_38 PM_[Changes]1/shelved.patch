@@ -1,0 +1,60 @@
+Index: Frontend/src/layouts/SidebarLayout.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Frontend/src/layouts/SidebarLayout.jsx b/Frontend/src/layouts/SidebarLayout.jsx
+deleted file mode 100644
+--- a/Frontend/src/layouts/SidebarLayout.jsx	(revision 35348c3de824aa812847332a429b10bd0e1a8539)
++++ /dev/null	(revision 35348c3de824aa812847332a429b10bd0e1a8539)
+@@ -1,12 +0,0 @@
+-import Sidebar from "./Sidebar";
+-
+-export default function SidebarLayout({ children }) {
+-  return (
+-    <div className="flex">
+-      <Sidebar />
+-      <main className="flex-1 md:ml-25 p-2 bg-gray-100 min-h-screen">
+-        {children}
+-      </main>
+-    </div>
+-  );
+-}
+Index: se-webservices/src/main/java/org/wldu/webservices/config/SecurityConfig.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package org.wldu.webservices.config;\n\nimport org.springframework.context.annotation.Bean;\nimport org.springframework.context.annotation.Configuration;\nimport org.springframework.http.HttpMethod;\nimport org.springframework.security.authentication.AuthenticationManager;\nimport org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;\nimport org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;\nimport org.springframework.security.config.annotation.web.builders.HttpSecurity;\nimport org.springframework.security.config.http.SessionCreationPolicy;\nimport org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;\nimport org.springframework.security.crypto.password.PasswordEncoder;\nimport org.springframework.security.web.SecurityFilterChain;\nimport org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;\nimport org.wldu.webservices.auths.CustomUserDetailsService;\nimport org.wldu.webservices.auths.JwtAuthFilter;\nimport org.wldu.webservices.auths.JwtUtil;\n\n@Configuration\n@EnableMethodSecurity\npublic class SecurityConfig {\n\n    @Bean\n    public JwtAuthFilter jwtAuthFilter(\n            JwtUtil jwtUtil,\n            CustomUserDetailsService userDetailsService\n    ) {\n        return new JwtAuthFilter(jwtUtil, userDetailsService);\n    }\n\n    @Bean\n    public SecurityFilterChain filterChain(\n            HttpSecurity http,\n            JwtAuthFilter jwtAuthFilter\n    ) throws Exception {\n\n        http\n\n                .cors()\n\n                .and()\n                .csrf(csrf -> csrf.disable())\n\n                // \uD83D\uDD10 Stateless\n                .sessionManagement(session ->\n                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)\n                )\n\n\n                .authorizeHttpRequests(auth -> auth\n\n\n                        .requestMatchers(HttpMethod.OPTIONS, \"/**\").permitAll()\n\n\n                        .requestMatchers(\"/auth/**\").permitAll()\n                        .requestMatchers(\"/api/user/register\").permitAll()\n                        .requestMatchers(\"/api/books/list\").permitAll()\n                        .requestMatchers(\"/api/books/fetch\").permitAll()\n                        .requestMatchers(\"/api/customers/**\").permitAll()\n\n                        // \uD83D\uDD12 ADMIN only\n                        .requestMatchers(\"/api/user/delete\").hasRole(\"ADMIN\")\n                        .requestMatchers(\"/api/user/update\").hasRole(\"ADMIN\")\n                        .requestMatchers(\"/api/user/getAllUsers\").hasRole(\"ADMIN\")\n\n\n                        .requestMatchers(\"/api/books/addbook\").hasRole(\"ADMIN\")\n                        .requestMatchers(\"/api/books/update/**\").hasRole(\"ADMIN\")\n                        .requestMatchers(\"/api/books/delete/**\").hasRole(\"ADMIN\")\n\n                        .requestMatchers(\"/api/borrow/**\").hasAnyRole(\"ADMIN\",\"LIBRARIAN\")\n                        .requestMatchers(\"/admin/**\").hasRole(\"ADMIN\")\n                        .requestMatchers(\"/api/penalities/**\").hasRole(\"ADMIN\")\n\n\n\n                        // \uD83D\uDD10 everything else\n                        .anyRequest().authenticated()\n                )\n\n                // \uD83D\uDD10 JWT FILTER\n                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);\n\n        return http.build();\n    }\n\n    @Bean\n    public PasswordEncoder passwordEncoder() {\n        return new BCryptPasswordEncoder();\n    }\n\n    @Bean\n    public AuthenticationManager authenticationManager(\n            AuthenticationConfiguration config\n    ) throws Exception {\n        return config.getAuthenticationManager();\n    }\n}\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/se-webservices/src/main/java/org/wldu/webservices/config/SecurityConfig.java b/se-webservices/src/main/java/org/wldu/webservices/config/SecurityConfig.java
+--- a/se-webservices/src/main/java/org/wldu/webservices/config/SecurityConfig.java	(revision 35348c3de824aa812847332a429b10bd0e1a8539)
++++ b/se-webservices/src/main/java/org/wldu/webservices/config/SecurityConfig.java	(date 1766600718477)
+@@ -71,7 +71,7 @@
+ 
+                         .requestMatchers("/api/borrow/**").hasAnyRole("ADMIN","LIBRARIAN")
+                         .requestMatchers("/admin/**").hasRole("ADMIN")
+-                        .requestMatchers("/api/penalities/**").hasRole("ADMIN")
++                        .requestMatchers("/api/penalties/**").hasAnyRole("ADMIN", "LIBRARIAN")
+ 
+ 
+ 
+Index: se-webservices/src/main/resources/application.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>spring.application.name=webservices\n\n# DataSource configuration\nspring.datasource.url=jdbc:postgresql://localhost:5432/WebServicedb\nspring.datasource.username=postgres\nspring.datasource.password=123456\nspring.datasource.driver-class-name=org.postgresql.Driver\nspring.datasource.hikari.maximum-pool-size=10\n# Hibernate configuration\nspring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect\nspring.jpa.hibernate.ddl-auto=update\nspring.jpa.show-sql=true\nspring.jpa.properties.hibernate.format_sql=true\n#loging\nlogging.level.com.zaxxer.hikari.HikariDataSource=DEBUG\nlogging.level.com.zaxxer.hikari=TRACE\n# Server configuration\nserver.port=8081\n#creditioal\n#spring.security.user.name=admin\n#spring.security.user.password=admin\n\nspring.servlet.multipart.max-file-size=10MB\nspring.servlet.multipart.max-request-size=10MB\nupload.directory=uploads/company\n# ssl config\nserver.ssl.key-store=classpath:myapp.p12\nserver.ssl.key-store-password=123456\nserver.ssl.key-store-type=PKCS12\nserver.ssl.key-alias=myapp\n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git a/se-webservices/src/main/resources/application.properties b/se-webservices/src/main/resources/application.properties
+--- a/se-webservices/src/main/resources/application.properties	(revision 35348c3de824aa812847332a429b10bd0e1a8539)
++++ b/se-webservices/src/main/resources/application.properties	(date 1766600718477)
+@@ -3,7 +3,7 @@
+ # DataSource configuration
+ spring.datasource.url=jdbc:postgresql://localhost:5432/WebServicedb
+ spring.datasource.username=postgres
+-spring.datasource.password=123456
++spring.datasource.password=password
+ spring.datasource.driver-class-name=org.postgresql.Driver
+ spring.datasource.hikari.maximum-pool-size=10
+ # Hibernate configuration
