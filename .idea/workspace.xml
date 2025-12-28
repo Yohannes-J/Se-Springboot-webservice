@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="83409f98-5e1d-43fb-89d4-b43d908f58f4" name="Changes" comment="Revert &quot;some change&quot;&#10;&#10;This reverts commit 30f2fb1e">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/pages/Books.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/pages/Books.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/pages/Customer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/pages/Customer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/pages/Penalty.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/pages/Penalty.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/auths/Users.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/auths/Users.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/controllers/CustomerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/controllers/CustomerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/repositories/CustomerRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/repositories/CustomerRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/services/contracts/CustomerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/services/contracts/CustomerService.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Yohannes-J&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Yohannes-J/Se-Springboot-webservice.git&quot;,
+    &quot;accountId&quot;: &quot;498f4851-6791-4486-b353-ea3d3c5dfd94&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="37Ir8Y1QVdy3wb0xKjq0CIzZzxv" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Lms" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.138" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="83409f98-5e1d-43fb-89d4-b43d908f58f4" name="Changes" comment="" />
+      <created>1766601270209</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1766601270209</updated>
+    </task>
+    <task id="LOCAL-00001" summary="penality">
+      <option name="closed" value="true" />
+      <created>1766601405277</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1766601405277</updated>
+    </task>
+    <task id="LOCAL-00002" summary="some change">
+      <option name="closed" value="true" />
+      <created>1766754694746</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1766754694747</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Revert &quot;some change&quot;&#10;&#10;This reverts commit 30f2fb1e">
+      <option name="closed" value="true" />
+      <created>1766758365089</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1766758365090</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="penality" />
+    <MESSAGE value="some change" />
+    <MESSAGE value="Revert &quot;some change&quot;&#10;&#10;This reverts commit 30f2fb1e" />
+    <option name="LAST_COMMIT_MESSAGE" value="Revert &quot;some change&quot;&#10;&#10;This reverts commit 30f2fb1e" />
+  </component>
+</project>

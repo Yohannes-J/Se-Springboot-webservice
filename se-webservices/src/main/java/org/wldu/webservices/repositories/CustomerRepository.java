@@ -1,6 +1,9 @@
 package org.wldu.webservices.repositories;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.wldu.webservices.entities.Book;
 import org.wldu.webservices.entities.Customer;
 
 import java.util.List;
@@ -14,4 +17,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long> {
     List<Customer> findByNameContainingIgnoreCase(String name);
 
     List<Customer> findByEmailContainingIgnoreCase(String email);
+
+    Page<Customer> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }

@@ -2,101 +2,78 @@ package org.wldu.webservices.services.contracts;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.wldu.webservices.entities.BorrowBook;
 import org.wldu.webservices.entities.Penalty;
+import org.wldu.webservices.repositories.BorrowRepository;
 import org.wldu.webservices.repositories.PenaltyRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class PenaltyService {
 
     private final PenaltyRepository penaltyRepository;
+    private final BorrowRepository borrowRepository;
 
-    /* =====================================================
-       CREATE PENALTY
-       ===================================================== */
-    public Penalty addPenalty(Penalty penalty) {
-        return penaltyRepository.save(penalty);
-    }
+    // Create or update penalty based on borrow
+    public Penalty saveOrUpdatePenalty(Long borrowId, Penalty p) {
+        BorrowBook borrow = borrowRepository.findById(borrowId)
+                .orElseThrow(() -> new RuntimeException("Borrow not found"));
 
-    /* =====================================================
-       UPDATE PENALTY
-       ===================================================== */
-    public Penalty updatePenalty(Long id, Penalty updatedPenalty) {
+        Optional<Penalty> existing = penaltyRepository.findByBorrow(borrow);
 
-        Penalty penalty = penaltyRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Penalty not found with id " + id));
-
-        /* ---------- Relations ---------- */
-        if (updatedPenalty.getCustomer() != null)
-            penalty.setCustomer(updatedPenalty.getCustomer());
-
-        if (updatedPenalty.getBook() != null)
-            penalty.setBook(updatedPenalty.getBook());
-
-        if (updatedPenalty.getBorrowBook() != null)
-            penalty.setBorrowBook(updatedPenalty.getBorrowBook());
-
-        /* ---------- Penalty Breakdown ---------- */
-        penalty.setOverdueDays(updatedPenalty.getOverdueDays());
-        penalty.setLatePenalty(updatedPenalty.getLatePenalty());
-        penalty.setBrokenPenalty(updatedPenalty.getBrokenPenalty());
-        penalty.setLostPenalty(updatedPenalty.getLostPenalty());
-        penalty.setTotalPenalty(updatedPenalty.getTotalPenalty());
-
-        /* ---------- Status ---------- */
-        penalty.setPaid(updatedPenalty.isPaid());
-        penalty.setResolved(updatedPenalty.isResolved());
-
-        return penaltyRepository.save(penalty);
-    }
-
-    /* =====================================================
-       DELETE PENALTY
-       ===================================================== */
-    public void deletePenalty(Long id) {
-        if (!penaltyRepository.existsById(id)) {
-            throw new RuntimeException("Penalty not found with id " + id);
+        Penalty penalty;
+        if (existing.isPresent()) {
+            // Update
+            penalty = existing.get();
+            penalty.setBrokenPages(p.getBrokenPages());
+            penalty.setLatePenalty(p.getLatePenalty());
+            penalty.setLost(p.getLost());
+            penalty.setLostPrice(p.getLostPrice());
+            penalty.setTotalPenalty(
+                    p.getLatePenalty() + p.getBrokenPages() * 2 + (p.getLost() ? p.getLostPrice() : 0)
+            );
+            penalty.setStatus(p.getStatus());
+        } else {
+            // Create
+            penalty = Penalty.builder()
+                    .borrow(borrow)
+                    .customer(borrow.getCustomer())
+                    .brokenPages(p.getBrokenPages())
+                    .latePenalty(p.getLatePenalty())
+                    .lost(p.getLost())
+                    .lostPrice(p.getLostPrice())
+                    .totalPenalty(
+                            p.getLatePenalty() + p.getBrokenPages() * 2 + (p.getLost() ? p.getLostPrice() : 0)
+                    )
+                    .status(p.getStatus())
+                    .build();
         }
+        return penaltyRepository.save(penalty);
+    }
+
+    // Update status only
+    public Penalty updateStatus(Long id, Boolean status) {
+        Penalty penalty = penaltyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Penalty not found"));
+        penalty.setStatus(status);
+        return penaltyRepository.save(penalty);
+    }
+
+    // Delete penalty
+    public void deletePenalty(Long id) {
         penaltyRepository.deleteById(id);
     }
 
-    /* =====================================================
-       GET PENALTY BY ID
-       ===================================================== */
-    public Penalty getPenalty(Long id) {
-        return penaltyRepository.findById(id)
-                .orElseThrow(() ->
-                        new RuntimeException("Penalty not found with id " + id));
-    }
-
-    /* =====================================================
-       GET ALL PENALTIES
-       ===================================================== */
+    // Get all penalties
     public List<Penalty> getAllPenalties() {
         return penaltyRepository.findAll();
     }
 
-    /* =====================================================
-       GET PENALTIES BY CUSTOMER
-       ===================================================== */
+    // Get penalties by customer
     public List<Penalty> getPenaltiesByCustomer(Long customerId) {
         return penaltyRepository.findByCustomerId(customerId);
-    }
-
-    /* =====================================================
-       GET PENALTIES BY BOOK
-       ===================================================== */
-    public List<Penalty> getPenaltiesByBook(Long bookId) {
-        return penaltyRepository.findByBookId(bookId);
-    }
-
-    /* =====================================================
-       GET PENALTIES BY BORROW RECORD
-       ===================================================== */
-    public List<Penalty> getPenaltiesByBorrowBook(Long borrowBookId) {
-        return penaltyRepository.findByBorrowBookId(borrowBookId);
     }
 }

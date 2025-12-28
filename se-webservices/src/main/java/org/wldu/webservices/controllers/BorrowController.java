@@ -31,11 +31,29 @@ public class BorrowController {
             return ResponseEntity.status(500).body(e.getMessage());
         }
     }
-
+    // ===== ADD THIS BELOW OTHER METHODS =====
+    @PutMapping("/penalty/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
+    public ResponseEntity<BorrowBook> updatePenalty(
+            @PathVariable Long id,
+            @RequestBody BorrowBook penaltyData
+    ) {
+        return ResponseEntity.ok(borrowService.updatePenalty(id, penaltyData));
+    }
     @PutMapping("/return/{id}")
     public ResponseEntity<?> returnBook(@PathVariable Long id) {
         try {
             return ResponseEntity.ok(borrowService.returnBook(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+    // Add this to BorrowController.java
+    @PutMapping("/undo-return/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
+    public ResponseEntity<?> undoReturn(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(borrowService.undoReturnBook(id));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(e.getMessage());
         }

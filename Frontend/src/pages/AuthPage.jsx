@@ -20,6 +20,14 @@ const AuthPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+     // username validation for register
+    if (!isLogin && form.username.length < 2) {
+      setMessage({
+        text: "Username must be at least 2 characters.",
+        type: "error",
+      });
+      return;
+    }
     // Password validation for register
     if (!isLogin && form.password.length < 6) {
       setMessage({

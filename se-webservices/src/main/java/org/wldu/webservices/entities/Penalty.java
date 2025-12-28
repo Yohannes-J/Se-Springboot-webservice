@@ -2,86 +2,36 @@ package org.wldu.webservices.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "penalties")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
+@Table(name = "penalties")
 public class Penalty {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /* ===================== RELATIONSHIPS ===================== */
+    @ManyToOne
+    @JoinColumn(name = "borrow_id", nullable = false)
+    private BorrowBook borrow; // Borrow record
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "borrow_book_id", nullable = false)
-    private BorrowBook borrowBook;
+    private Integer brokenPages = 0;
+    private Double latePenalty = 0.0;
+    private Boolean lost = false;
+    private Double lostPrice = 0.0;
+    private Double totalPenalty = 0.0;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "book_id", nullable = false)
-    private Book book;
+    private Boolean status = false; // Pending=false, Resolved=true
 
-    /* ===================== PENALTY DETAILS ===================== */
-
-    // Number of days overdue
-    private Integer overdueDays;
-
-    // Late return penalty
-    @Column(nullable = false)
-    private BigDecimal latePenalty = BigDecimal.ZERO;
-
-    // Broken pages penalty
-    @Column(nullable = false)
-    private BigDecimal brokenPenalty = BigDecimal.ZERO;
-
-    // Lost book penalty
-    @Column(nullable = false)
-    private BigDecimal lostPenalty = BigDecimal.ZERO;
-
-    // Total penalty amount
-    @Column(nullable = false)
-    private BigDecimal totalPenalty = BigDecimal.ZERO;
-
-    /* ===================== STATUS ===================== */
-
-    // Paid or not
-    @Column(nullable = false)
-    private boolean paid = false;
-
-    // Penalty resolved by admin/librarian
-    @Column(nullable = false)
-    private boolean resolved = false;
-
-    /* ===================== AUDIT ===================== */
-
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-
-
+    private LocalDate createdAt = LocalDate.now();
 }

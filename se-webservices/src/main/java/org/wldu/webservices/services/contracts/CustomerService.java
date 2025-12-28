@@ -1,6 +1,11 @@
 package org.wldu.webservices.services.contracts;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.wldu.webservices.entities.Book;
 import org.wldu.webservices.entities.Customer;
 import org.wldu.webservices.repositories.CustomerRepository;
 
@@ -90,4 +95,21 @@ public class CustomerService {
     public List<Customer> searchByEmail(String email) {
         return customerRepository.findByEmailContainingIgnoreCase(email);
     }
+
+    public Page<Customer> getCustomers(String search, int page, int size, String sortBy, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase("asc")
+                ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        if (search != null && !search.isEmpty()) {
+            return customerRepository.findByNameContainingIgnoreCase(search, pageable);
+        }
+
+        return customerRepository.findAll(pageable);
+    }
+
+
+
 }

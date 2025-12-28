@@ -17,8 +17,9 @@ public class Users {
     private Long id;
 
     @Column(unique = true, nullable = false)
-
+    @Size(min = 2, message= "username must be at least 2 characters")
     private String username;
+
 
     @Column(nullable = false)
     @Size(min = 6, message = "Password must be at least 6 characters")
