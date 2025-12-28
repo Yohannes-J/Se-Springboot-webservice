@@ -10,6 +10,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Penality from "./pages/Penalty";
 import Customer from "./pages/Customer";
 import AddBook from "./pages/AddBook";
+import Material from "./pages/Material";
+import DigitalMaterial from "./pages/DigitalMaterial";
 
 // 1. This component checks if the user is logged in
 function ProtectedRoute({ children }) {
@@ -28,6 +30,7 @@ function Layout({ children }) {
   return (
     <>
       <Navbar />
+
       <div className="pt-20 p-4">{children}</div>
     </>
   );
@@ -41,7 +44,8 @@ function AppWrapper() {
     <Routes>
       {/* Public Route - Login/Register */}
       <Route path="/" element={<AuthPage />} />
-
+      
+      
       {/* Private Routes - All nested inside ProtectedRoute */}
       <Route
         path="/*"
@@ -59,7 +63,9 @@ function AppWrapper() {
                 <Route path="/assign-role" element={<AssignRole />} />
                 <Route path="/penality" element={<Penality />} />
                 <Route path="/books/add" element={<AddBook />} />
-                
+                <Route path="/material" element={<Material />} />
+                <Route path="/digital-material" element={<DigitalMaterial />} />
+
                 {/* Catch-all for logged-in users */}
                 <Route path="*" element={<div>404 Not Found</div>} />
               </Routes>

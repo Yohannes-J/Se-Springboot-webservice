@@ -27,8 +27,16 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.addCustomer(customer));
     }
 
+    // Get all users
+    @GetMapping
+    public List<Customer> getAllCustomers() {
+        return customerService.getAllCustomers();
+    }
+
+
+
     @GetMapping("/list")
-    public Map<String, Object> getCustomers(
+    public Map<String, Object> getCustomerList(
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -51,12 +59,6 @@ public class CustomerController {
         response.put("pageSize", customerPage.getSize());
 
         return response;
-    }
-
-    // Get all users
-    @GetMapping
-    public List<Customer> getAllCustomers() {
-        return customerService.getAllCustomers();
     }
 
     // Get user by ID

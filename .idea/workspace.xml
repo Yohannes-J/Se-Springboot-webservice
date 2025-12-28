@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="83409f98-5e1d-43fb-89d4-b43d908f58f4" name="Changes" comment="some change">
+    <list default="true" id="83409f98-5e1d-43fb-89d4-b43d908f58f4" name="Changes" comment="Revert &quot;some change&quot;&#10;&#10;This reverts commit 30f2fb1e">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Frontend/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Frontend/src/pages/AuthPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/pages/AuthPage.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/controllers/BorrowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/controllers/BorrowController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/controllers/PenaltyController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/entities/Book.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/entities/Book.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/entities/BorrowBook.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/entities/BorrowBook.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/entities/Penalty.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/repositories/PenaltyRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/services/contracts/BorrowService.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/services/contracts/BorrowService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/services/contracts/PenaltyService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/pages/Books.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/pages/Books.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/pages/Customer.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/pages/Customer.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Frontend/src/pages/Penalty.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/Frontend/src/pages/Penalty.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/auths/Users.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/auths/Users.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/controllers/CustomerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/controllers/CustomerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/repositories/CustomerRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/repositories/CustomerRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/services/contracts/CustomerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/se-webservices/src/main/java/org/wldu/webservices/services/contracts/CustomerService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,6 +50,14 @@
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="Lms" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -83,12 +89,32 @@
       <option name="project" value="LOCAL" />
       <updated>1766754694747</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Revert &quot;some change&quot;&#10;&#10;This reverts commit 30f2fb1e">
+      <option name="closed" value="true" />
+      <created>1766758365089</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1766758365090</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="penality" />
     <MESSAGE value="some change" />
-    <option name="LAST_COMMIT_MESSAGE" value="some change" />
+    <MESSAGE value="Revert &quot;some change&quot;&#10;&#10;This reverts commit 30f2fb1e" />
+    <option name="LAST_COMMIT_MESSAGE" value="Revert &quot;some change&quot;&#10;&#10;This reverts commit 30f2fb1e" />
   </component>
 </project>

@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { FaBook } from "react-icons/fa";
 import { motion } from "framer-motion";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [form, setForm] = useState({ username: "", password: "" });
@@ -20,6 +22,14 @@ const AuthPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+     // username validation for register
+    if (!isLogin && form.username.length < 2) {
+      setMessage({
+        text: "Username must be at least 2 characters.",
+        type: "error",
+      });
+      return;
+    }
     // Password validation for register
     if (!isLogin && form.password.length < 6) {
       setMessage({
@@ -36,7 +46,7 @@ const AuthPage = () => {
       if (isLogin) {
         // LOGIN
         const res = await axios.post(
-          "https://localhost:8081/auth/login",
+          `${BASE_URL}/auth/login`,
           {
             username: form.username,
             password: form.password,
@@ -59,7 +69,7 @@ const AuthPage = () => {
       } else {
         // REGISTER
         await axios.post(
-          "https://localhost:8081/api/user/register",
+          `${BASE_URL}/user/register`,
           {
             username: form.username,
             password: form.password,

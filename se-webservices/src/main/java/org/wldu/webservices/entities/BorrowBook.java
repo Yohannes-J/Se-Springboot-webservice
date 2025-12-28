@@ -1,6 +1,5 @@
 package org.wldu.webservices.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 @Table(name = "borrow_books")
 public class BorrowBook {
 
@@ -24,17 +22,20 @@ public class BorrowBook {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    @JsonIgnoreProperties("borrowedBooks")
     private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "book_id")
-    @JsonIgnoreProperties("borrowers")
     private Book book;
 
     private LocalDateTime borrowDate;
-
     private LocalDateTime returnDate;
-
     private boolean returned = false;
+
+    // ===== PENALTY FIELDS =====
+    private Integer brokenPages = 0;
+    private Double latePenalty = 0.0;
+    private Boolean lost = false;
+    private Double lostPrice = 0.0;
+    private Boolean status = false; // false=Pending, true=Resolved
 }

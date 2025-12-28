@@ -26,7 +26,7 @@ ChartJS.register(
   Legend
 );
 
-const BASE_URL = "https://localhost:8081";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -93,7 +93,7 @@ export default function AdminDashboard() {
         <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-extrabold text-gray-900">
-              Admin Dashboard
+              Admin <span className="text-indigo-600">Dashboard</span>
             </h1>
             <p className="text-gray-500 mt-1">
               Monitor your system library performance.
