@@ -41,21 +41,48 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers(
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/user/register").permitAll()
                         .requestMatchers("/api/books/list").permitAll()
+                        .requestMatchers("/uploads/**").permitAll()
                         .requestMatchers("/api/books/fetch").permitAll()
+                        .requestMatchers("/api/digital-materials/**").permitAll()
                         .requestMatchers("/api/customers/**").permitAll()
                         .requestMatchers("/api/user/delete").hasRole("ADMIN")
                         .requestMatchers("/api/user/update").hasRole("ADMIN")
                         .requestMatchers("/api/user/getAllUsers").hasRole("ADMIN")
+                        .requestMatchers("/api/user/activate/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/deactivate/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/reset-password/**").hasRole("ADMIN")
+                        .requestMatchers("/api/user/revoke-role").hasRole("ADMIN")
+                        .requestMatchers("/api/user/toggle-activation").hasRole("ADMIN")
+
+
                         .requestMatchers("/api/books/addbook").hasRole("ADMIN")
                         .requestMatchers("/api/books/update/**").hasRole("ADMIN")
                         .requestMatchers("/api/books/delete/**").hasRole("ADMIN")
                         .requestMatchers("/api/borrow/**").hasAnyRole("ADMIN", "LIBRARIAN")
+                        // Digital materials endpoints
+                        .requestMatchers("/api/digital-materials/upload").hasRole("ADMIN")
+                        .requestMatchers("/api/digital-materials/getAll").permitAll()
+                        .requestMatchers("/api/digital-materials/download/**").permitAll()
+                        .requestMatchers("/api/digital-materials/view/**").permitAll()
+
+                        .requestMatchers("/api/digital-materials/delete/**").hasRole("ADMIN")
+
+
+
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/penalties/**").hasRole("ADMIN")
+                        .requestMatchers("/api/penalties/**")
+                        .hasAnyRole("ADMIN", "LIBRARIAN")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

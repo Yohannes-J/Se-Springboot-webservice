@@ -3,7 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // Using http to avoid SSL issues on localhost
-const BASE_URL = "https://localhost:8081/api";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function Borrow() {
   const [customers, setCustomers] = useState([]);

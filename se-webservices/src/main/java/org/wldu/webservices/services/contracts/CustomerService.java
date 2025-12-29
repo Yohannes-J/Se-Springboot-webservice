@@ -97,7 +97,6 @@ public class CustomerService {
     }
 
     public Page<Customer> getCustomers(String search, int page, int size, String sortBy, String sortDir) {
-
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -110,6 +109,7 @@ public class CustomerService {
 
         return customerRepository.findAll(pageable);
     }
+
 
 
 }

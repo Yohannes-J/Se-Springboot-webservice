@@ -13,6 +13,7 @@ import {
   FiShield,
   FiUserCheck,
   FiAlertCircle,
+
 } from "react-icons/fi";
 import logo from "../assets/logo.png";
 
@@ -46,6 +47,13 @@ export default function Navbar() {
       icon: <FiBook />,
       roles: ["USER", "LIBRARIAN", "ADMIN"],
     },
+    {
+      name: "Digital Materials",
+      path: "/digital-material",
+      icon: <FiBook />,
+      roles: ["USER", "LIBRARIAN", "ADMIN"],
+    },
+
 
     // Librarian and Admin Only
     {
@@ -80,6 +88,13 @@ export default function Navbar() {
       icon: <FiUserCheck />,
       roles: ["ADMIN"],
     },
+    {
+      name: "Materials",
+      path: "/material",
+      icon: <FiBook />,
+      roles: ["ADMIN"],
+    },
+
     { name: "Admin", path: "/admin", icon: <FiShield />, roles: ["ADMIN"] },
   ];
 

@@ -1,15 +1,16 @@
 import Navbar from "../components/Navbar";
-import { useNavigate } from "react-router-dom"; // 1. Import the hook
+import { useNavigate } from "react-router-dom";
 import libraryHero from "../assets/home.jpeg";
 import libraryMission from "../assets/library.jpg";
 import libraryVision from "../assets/library3.jpeg";
 import libraryValues from "../assets/library2.jpeg";
 
 export default function Home() {
-  const navigate = useNavigate(); // 2. Initialize the navigate function
+  const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-gray-900 bg-white">
+    <div className="flex flex-col min-h-screen font-sans text-gray-900 bg-white scroll-smooth">
+
       {/* Custom Shimmer Animation Style */}
       <style>
         {`
@@ -18,6 +19,13 @@ export default function Home() {
           }
           .animate-shimmer {
             animation: shimmer 2s infinite;
+          }
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fade-in {
+            animation: fadeIn 1s ease-out forwards;
           }
         `}
       </style>
@@ -28,22 +36,24 @@ export default function Home() {
         style={{ backgroundImage: `url(${libraryHero})` }}
       >
         {/* Modern Glassmorphism Overlay */}
-        <div className="absolute inset-0 bg-linear-to-b from-black/70 via-black/40 to-black/70 backdrop-blur-[2px]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70 backdrop-blur-[2px]"></div>
 
         <div className="relative z-10 text-center px-6 max-w-5xl animate-fade-in">
           <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight drop-shadow-2xl">
             Woldia University <br />
             <span className="text-blue-400">Digital Library</span>
           </h1>
+
           <p className="text-gray-100 text-lg md:text-2xl mb-10 leading-relaxed font-light max-w-3xl mx-auto drop-shadow-md">
-            Your gateway to a world of knowledge. Explore thousands of
-            resources, track your borrowings, and innovate with ease.
+            A modern digital gateway to academic excellence. Search, borrow,
+            read online, and download thousands of books and learning materials
+            while managing your library activities effortlessly in one
+            intelligent platform.
           </p>
 
-          {/* Beautiful "Books" Button */}
           <div className="flex justify-center">
             <button
-              onClick={() => navigate("/books")} // 3. Added the click handler
+              onClick={() => navigate("/books")}
               className="relative group overflow-hidden px-14 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white rounded-full font-bold text-xl transition-all duration-300 shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_35px_rgba(37,99,235,0.6)] hover:-translate-y-1 active:scale-95"
             >
               {/* Shimmer Effect Layer */}
@@ -86,17 +96,17 @@ export default function Home() {
               {
                 img: libraryMission,
                 title: "Our Mission",
-                text: "To provide students and faculty with easy access to digital resources, supporting research and learning across all disciplines.",
+                text: "To deliver seamless access to digital and physical library resources, enabling users to borrow books, read online, download materials, and support academic success across all disciplines.",
               },
               {
                 img: libraryVision,
                 title: "Our Vision",
-                text: "To become a leading digital library in Ethiopia, empowering knowledge discovery and innovation for all researchers.",
+                text: "To become a leading digital library in Ethiopia by embracing technology-driven solutions that empower research, innovation, and lifelong learning.",
               },
               {
                 img: libraryValues,
                 title: "Our Values",
-                text: "Accessibility, Integrity, Excellence, and Innovation guide our library services and support student success.",
+                text: "Accessibility, integrity, innovation, and excellence guide our commitment to providing a reliable, secure, and user-friendly digital library experience.",
               },
             ].map((item, index) => (
               <div
@@ -136,15 +146,24 @@ export default function Home() {
           <h2 className="text-4xl md:text-5xl font-bold mb-8 text-gray-900 tracking-tight">
             About Our Library
           </h2>
-          <p className="text-gray-600 text-xl leading-relaxed font-light">
-            Our Library Management System allows users to explore books easily,
-            manage borrowings and returns, and track availability in real-time.
-            Whether you’re a student, teacher, or book lover, we provide a{" "}
-            <span className="text-blue-600 font-semibold italic">
-              seamless digital experience
-            </span>{" "}
-            to access the world's knowledge.
-          </p>
+          <div className="text-gray-600 text-xl leading-relaxed font-light space-y-6">
+            <p>
+              The Woldia University Digital Library Management System transforms
+              traditional library services into a modern digital experience.
+              Users can easily search for books, borrow physical and digital
+              materials, read books online, download resources for offline use,
+              and monitor borrowing and return activities in real time.
+            </p>
+            <p>
+              Designed for students, lecturers, and researchers, our system
+              provides a{" "}
+              <span className="text-blue-600 font-semibold italic">
+                secure, efficient, and highly intuitive platform
+              </span>{" "}
+              that enhances learning, research, and knowledge sharing across the
+              university community.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -160,13 +179,15 @@ export default function Home() {
                 <p className="text-blue-400 font-semibold tracking-widest uppercase text-xs">
                   Email Us
                 </p>
-                <p className="text-lg font-medium">Digitallibrary@gmail.com</p>
+                <p className="text-lg font-medium tracking-tight">
+                  digitallibrary@wldu.edu.et
+                </p>
               </div>
               <div className="space-y-3">
                 <p className="text-blue-400 font-semibold tracking-widest uppercase text-xs">
                   Call Us
                 </p>
-                <p className="text-lg font-medium">+251 924-16-49-94</p>
+                <p className="text-lg font-medium">+251 924 16 49 94</p>
               </div>
               <div className="space-y-3">
                 <p className="text-blue-400 font-semibold tracking-widest uppercase text-xs">
@@ -190,26 +211,17 @@ export default function Home() {
             </h2>
           </div>
           <p className="mb-6 text-sm">
-            © {new Date().getFullYear()} Library Management System. Crafted for
-            Excellence.
+            © {new Date().getFullYear()} Digital Library Management System.
+            Empowering Knowledge Through Technology.
           </p>
           <div className="flex justify-center gap-8 text-sm font-medium">
-            <a
-              href="#"
-              className="hover:text-white transition-colors duration-300"
-            >
+            <a href="#" className="hover:text-white transition-colors duration-300">
               Privacy Policy
             </a>
-            <a
-              href="#"
-              className="hover:text-white transition-colors duration-300"
-            >
+            <a href="#" className="hover:text-white transition-colors duration-300">
               Terms of Service
             </a>
-            <a
-              href="#"
-              className="hover:text-white transition-colors duration-300"
-            >
+            <a href="#" className="hover:text-white transition-colors duration-300">
               Support
             </a>
           </div>

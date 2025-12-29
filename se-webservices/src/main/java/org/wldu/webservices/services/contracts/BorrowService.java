@@ -65,6 +65,31 @@ public class BorrowService {
 
         return borrow;
     }
+    /** Undo a return (Mistake Correction) */
+    public BorrowBook undoReturnBook(Long id) {
+        BorrowBook borrow = borrowRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Borrow record not found"));
+
+        // Only undo if it is currently marked as returned
+        if (borrow.isReturned()) {
+            borrow.setReturned(false);
+
+            // Decrease book copiesAvailable (it's back with the customer)
+            Book book = borrow.getBook();
+
+            // Check to avoid negative numbers (though rare in this logic)
+            if (book.getCopiesAvailable() != null && book.getCopiesAvailable() > 0) {
+                book.setCopiesAvailable(book.getCopiesAvailable() - 1);
+            } else {
+                book.setCopiesAvailable(0);
+            }
+
+            bookRepo.save(book);
+            return borrowRepo.save(borrow);
+        }
+
+        return borrow;
+    }
 
     public List<BorrowBook> getAllBorrowedBooks() {
         return borrowRepo.findAll();
@@ -77,4 +102,20 @@ public class BorrowService {
     public List<BorrowBook> getBorrowedBooksByBook(Long bookId) {
         return borrowRepo.findByBookId(bookId);
     }
+
+    // ===== ADD THIS METHOD ONLY =====
+    public BorrowBook updatePenalty(Long borrowId, BorrowBook penaltyData) {
+
+        BorrowBook borrow = borrowRepo.findById(borrowId)
+                .orElseThrow(() -> new RuntimeException("Borrow record not found"));
+
+        borrow.setBrokenPages(penaltyData.getBrokenPages());
+        borrow.setLatePenalty(penaltyData.getLatePenalty());
+        borrow.setLost(penaltyData.getLost());
+        borrow.setLostPrice(penaltyData.getLostPrice());
+        borrow.setStatus(penaltyData.getStatus());
+
+        return borrowRepo.save(borrow);
+    }
+
 }

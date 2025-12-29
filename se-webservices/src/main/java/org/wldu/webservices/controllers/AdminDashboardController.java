@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/admin") // class-level mapping to match frontend "/admin/dashboard"
+@RequestMapping("/api/admin") // class-level mapping to match frontend "/admin/dashboard"
 public class AdminDashboardController {
 
     private final UsersRepository usersRepository;
