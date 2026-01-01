@@ -2,6 +2,8 @@ import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const Penalty = () => {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -22,7 +24,7 @@ const Penalty = () => {
     const fetchRecords = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("https://localhost:8081/api/borrow/all", {
+        const res = await axios.get(`${BASE_URL}/borrow/all`, {
           headers,
         });
         const data = res.data.map((r) => ({
@@ -48,7 +50,7 @@ const Penalty = () => {
   const savePenalty = async (r) => {
     try {
       await axios.put(
-        `https://localhost:8081/api/borrow/penalty/${r.id}`,
+        `${BASE_URL}/borrow/penalty/${r.id}`,
         {
           brokenPages: r.brokenPages,
           latePenalty: r.latePenalty,

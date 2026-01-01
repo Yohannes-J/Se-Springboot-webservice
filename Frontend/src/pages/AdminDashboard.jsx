@@ -26,7 +26,7 @@ ChartJS.register(
   Legend
 );
 
-const BASE_URL = "https://localhost:8081";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState({
@@ -35,6 +35,7 @@ export default function AdminDashboard() {
     borrowed: 0,
     returned: 0,
     customers: 0,
+    reservations: 0, // ✅ added
   });
 
   const [loading, setLoading] = useState(true);
@@ -48,7 +49,15 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const res = await axios.get(`${BASE_URL}/admin/dashboard`, { headers });
-      setStats(res.data);
+
+      setStats({
+        users: res.data.users ?? 0,
+        books: res.data.books ?? 0,
+        borrowed: res.data.borrowed ?? 0,
+        returned: res.data.returned ?? 0,
+        customers: res.data.customers ?? 0,
+        reservations: res.data.reservations ?? 0, // ✅ safe
+      });
     } catch (err) {
       console.error(err);
       toast.error("Failed to load dashboard stats");
@@ -74,12 +83,17 @@ export default function AdminDashboard() {
   };
 
   const barData = {
-    labels: ["Users", "Books", "Customers"],
+    labels: ["Users", "Books", "Customers", "Reservations"],
     datasets: [
       {
         label: "System Overview",
-        data: [stats.users, stats.books, stats.customers],
-        backgroundColor: ["#3b82f6", "#10b981", "#f43f5e"],
+        data: [
+          stats.users,
+          stats.books,
+          stats.customers,
+          stats.reservations,
+        ],
+        backgroundColor: ["#3b82f6", "#10b981", "#f43f5e", "#6366f1"],
       },
     ],
   };
@@ -93,7 +107,7 @@ export default function AdminDashboard() {
         <header className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-extrabold text-gray-900">
-              Admin Dashboard
+              Admin <span className="text-indigo-600">Dashboard</span>
             </h1>
             <p className="text-gray-500 mt-1">
               Monitor your system library performance.
@@ -114,7 +128,7 @@ export default function AdminDashboard() {
         </header>
 
         {/* Stat Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-6">
           <StatCard
             title="Total Users"
             value={stats.users}
@@ -140,24 +154,22 @@ export default function AdminDashboard() {
             value={stats.customers}
             color="from-rose-500 to-rose-600"
           />
+          <StatCard
+            title="Reservations"
+            value={stats.reservations}
+            color="from-indigo-500 to-indigo-600"
+          />
         </div>
 
         {/* Charts */}
         <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Pie Chart (SMALLER) */}
           <div className="bg-white p-10 rounded-2xl shadow-lg h-64">
             <h2 className="text-lg font-bold text-gray-800 mb-2">
               Borrowed vs Returned
             </h2>
-            <Pie
-              data={pieData}
-              options={{
-                maintainAspectRatio: false,
-              }}
-            />
+            <Pie data={pieData} options={{ maintainAspectRatio: false }} />
           </div>
 
-          {/* Bar Chart (SMALLER) */}
           <div className="bg-white p-10 rounded-2xl shadow-lg h-60">
             <h2 className="text-lg font-bold text-gray-800 mb-2">
               System Statistics
@@ -167,9 +179,7 @@ export default function AdminDashboard() {
               options={{
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                  legend: { display: true },
-                },
+                plugins: { legend: { display: true } },
               }}
             />
           </div>
@@ -179,15 +189,22 @@ export default function AdminDashboard() {
   );
 }
 
-// ===================== STAT CARD =====================
-function StatCard({ title, value, color }) {
+/* ===================== SAFE STAT CARD ===================== */
+function StatCard({ title, value = 0, color }) {
+  const safeValue =
+    typeof value === "number" && !isNaN(value) ? value : 0;
+
   return (
     <div
       className={`relative overflow-hidden p-4 rounded-2xl shadow-lg bg-linear-to-br ${color} text-white transition-transform hover:scale-105`}
     >
       <div className="absolute -right-4 -top-4 h-16 w-16 rounded-full bg-white opacity-10" />
-      <h3 className="text-sm uppercase tracking-wider opacity-80">{title}</h3>
-      <p className="text-4xl font-bold mt-3">{value.toLocaleString()}</p>
+      <h3 className="text-sm uppercase tracking-wider opacity-80">
+        {title}
+      </h3>
+      <p className="text-4xl font-bold mt-3">
+        {safeValue.toLocaleString()}
+      </p>
     </div>
   );
 }

@@ -54,7 +54,7 @@ function AppWrapper() {
                   path="/books/add" 
                   element={<ProtectedRoute allowedRoles={["ADMIN"]}><AddBook /></ProtectedRoute>} 
                 />
-
+                
                 <Route path="*" element={<div>404 Not Found</div>} />
               </Routes>
             </Layout>

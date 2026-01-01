@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const BASE_URL = "https://localhost:8081/api/books";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL + "/books";
 
 export default function Books() {
   const [books, setBooks] = useState([]);
@@ -174,7 +174,7 @@ export default function Books() {
 
       <div className="max-w-7xl mx-auto p-4 md:p-6">
         <header className="mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <h1 className="text-xl font-black tracking-tight text-slate-900 uppercase">Inventory <span className="text-indigo-600">Control</span></h1>
+          <h1 className="text-xl font-black tracking-tight text-slate-900 uppercase"> <span className="text-indigo-600">Books</span></h1>
 
           {/* Logic: Only show Add button if user canManage */}
           {canManage && (

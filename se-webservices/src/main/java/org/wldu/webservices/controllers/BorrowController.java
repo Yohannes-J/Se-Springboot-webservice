@@ -18,6 +18,7 @@ public class BorrowController {
         this.borrowService = borrowService;
     }
 
+    // ================= BORROW BOOK =================
     @PostMapping("/borrow")
     @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
     public ResponseEntity<?> borrowBook(
@@ -26,51 +27,74 @@ public class BorrowController {
             @RequestParam(defaultValue = "14") int days
     ) {
         try {
-            return ResponseEntity.ok(borrowService.borrowBook(customerId, bookId, days));
+            return ResponseEntity.ok(
+                    borrowService.borrowBook(customerId, bookId, days)
+            );
         } catch (Exception e) {
             return ResponseEntity.status(500).body(e.getMessage());
         }
     }
-    // ===== ADD THIS BELOW OTHER METHODS =====
+
+    // ================= RETURN BOOK =================
+    @PutMapping("/return/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
+    public ResponseEntity<?> returnBook(@PathVariable Long id) {
+        try {
+            BorrowBook returned = borrowService.returnBook(id);
+            return ResponseEntity.ok(returned);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+
+    // ================= UNDO RETURN =================
+    @PutMapping("/undo-return/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
+    public ResponseEntity<?> undoReturn(@PathVariable Long id) {
+        try {
+            return ResponseEntity.ok(
+                    borrowService.undoReturnBook(id)
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+
+    // ================= UPDATE PENALTY =================
     @PutMapping("/penalty/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
     public ResponseEntity<BorrowBook> updatePenalty(
             @PathVariable Long id,
             @RequestBody BorrowBook penaltyData
     ) {
-        return ResponseEntity.ok(borrowService.updatePenalty(id, penaltyData));
-    }
-    @PutMapping("/return/{id}")
-    public ResponseEntity<?> returnBook(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(borrowService.returnBook(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage());
-        }
-    }
-    // Add this to BorrowController.java
-    @PutMapping("/undo-return/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','LIBRARIAN')")
-    public ResponseEntity<?> undoReturn(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(borrowService.undoReturnBook(id));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(e.getMessage());
-        }
+        return ResponseEntity.ok(
+                borrowService.updatePenalty(id, penaltyData)
+        );
     }
 
+    // ================= GETTERS =================
     @GetMapping("/all")
     public ResponseEntity<List<BorrowBook>> getAll() {
-        return ResponseEntity.ok(borrowService.getAllBorrowedBooks());
+        return ResponseEntity.ok(
+                borrowService.getAllBorrowedBooks()
+        );
     }
 
     @GetMapping("/customers/{customerId}")
-    public ResponseEntity<List<BorrowBook>> getByCustomer(@PathVariable Long customerId) {
-        return ResponseEntity.ok(borrowService.getBorrowedBooksByCustomer(customerId));
+    public ResponseEntity<List<BorrowBook>> getByCustomer(
+            @PathVariable Long customerId
+    ) {
+        return ResponseEntity.ok(
+                borrowService.getBorrowedBooksByCustomer(customerId)
+        );
     }
 
     @GetMapping("/book/{bookId}")
-    public ResponseEntity<List<BorrowBook>> getByBook(@PathVariable Long bookId) {
-        return ResponseEntity.ok(borrowService.getBorrowedBooksByBook(bookId));
+    public ResponseEntity<List<BorrowBook>> getByBook(
+            @PathVariable Long bookId
+    ) {
+        return ResponseEntity.ok(
+                borrowService.getBorrowedBooksByBook(bookId)
+        );
     }
 }

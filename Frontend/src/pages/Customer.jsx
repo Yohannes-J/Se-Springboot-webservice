@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 
-const BASE_URL = "https://localhost:8081/api/customers";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL + "/customers";
 
 export default function Customer() {
   const [users, setUsers] = useState([]);

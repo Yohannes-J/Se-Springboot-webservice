@@ -71,16 +71,14 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/digital-materials/delete/**").hasRole("ADMIN")
 
+                        .requestMatchers("/api/reservations/**").permitAll()
+
 
 
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-<<<<<<< HEAD
                         .requestMatchers("/api/penalties/**")
                         .hasAnyRole("ADMIN", "LIBRARIAN")
 
-=======
-                        .requestMatchers("/api/penalties/**").hasRole("ADMIN")
->>>>>>> origin/main
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

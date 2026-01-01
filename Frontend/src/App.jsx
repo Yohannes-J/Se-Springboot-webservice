@@ -1,29 +1,45 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+
 import AuthPage from "./pages/AuthPage";
 import Home from "./pages/Home";
 import Books from "./pages/Books";
 import Borrow from "./pages/Borrow";
-import Navbar from "./components/Navbar";
 import ReturnBook from "./pages/RetunBook";
 import AssignRole from "./pages/AssignRole";
 import AdminDashboard from "./pages/AdminDashboard";
 import Penality from "./pages/Penalty";
 import Customer from "./pages/Customer";
 import AddBook from "./pages/AddBook";
+import Material from "./pages/Material";
+import DigitalMaterial from "./pages/DigitalMaterial";
+import Reservation from "./pages/Reservation";
 
-// 1. This component checks if the user is logged in
-function ProtectedRoute({ children }) {
-  // It looks for the "token" you set during login
-  const isAuthenticated = localStorage.getItem("token"); 
-  
-  if (!isAuthenticated) {
-    // If no token, send them back to the Login page ("/")
+import Navbar from "./components/Navbar";
+
+/* ===================== PROTECTED ROUTE ===================== */
+function ProtectedRoute({ children, allowedRoles }) {
+  const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role")?.replace("ROLE_", "");
+
+  // Not logged in
+  if (!token) {
     return <Navigate to="/" replace />;
   }
+
+  // Role not allowed
+  if (allowedRoles && !allowedRoles.includes(role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return children;
 }
 
-// 2. This component wraps the Navbar and spacing for all internal pages
+/* ===================== LAYOUT ===================== */
 function Layout({ children }) {
   return (
     <>
@@ -33,34 +49,109 @@ function Layout({ children }) {
   );
 }
 
-// 3. This handles the logic for hiding Navbar and routing permissions
-function AppWrapper() {
-  const location = useLocation();
-
+/* ===================== ROUTES ===================== */
+function AppRoutes() {
   return (
     <Routes>
-      {/* Public Route - Login/Register */}
+      {/* PUBLIC */}
       <Route path="/" element={<AuthPage />} />
 
-      {/* Private Routes - All nested inside ProtectedRoute */}
+      {/* PRIVATE */}
       <Route
         path="/*"
         element={
           <ProtectedRoute>
             <Layout>
               <Routes>
-                {/* Admin and General Pages */}
-                <Route path="/admin" element={<AdminDashboard />} />
+                {/* ---- SHARED (USER, LIBRARIAN, ADMIN) ---- */}
                 <Route path="/dashboard" element={<Home />} />
-                <Route path="/customer" element={<Customer />} />
                 <Route path="/books" element={<Books />} />
-                <Route path="/borrow" element={<Borrow />} />
-                <Route path="/return" element={<ReturnBook />} />
-                <Route path="/assign-role" element={<AssignRole />} />
-                <Route path="/penality" element={<Penality />} />
-                <Route path="/books/add" element={<AddBook />} />
-                
-                {/* Catch-all for logged-in users */}
+                <Route path="/digital-material" element={<DigitalMaterial />} />
+
+                {/* ---- LIBRARIAN & ADMIN ---- */}
+                <Route
+                  path="/borrow"
+                  element={
+                    <ProtectedRoute allowedRoles={["LIBRARIAN", "ADMIN"]}>
+                      <Borrow />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/return"
+                  element={
+                    <ProtectedRoute allowedRoles={["LIBRARIAN", "ADMIN"]}>
+                      <ReturnBook />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/penality"
+                  element={
+                    <ProtectedRoute allowedRoles={["LIBRARIAN", "ADMIN"]}>
+                      <Penality />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/reservation"
+                  element={
+                    <ProtectedRoute allowedRoles={["LIBRARIAN", "ADMIN"]}>
+                      <Reservation />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* ---- ADMIN ONLY ---- */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/customer"
+                  element={
+                    <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <Customer />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/assign-role"
+                  element={
+                    <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <AssignRole />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/books/add"
+                  element={
+                    <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <AddBook />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/material"
+                  element={
+                    <ProtectedRoute allowedRoles={["ADMIN"]}>
+                      <Material />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* 404 */}
                 <Route path="*" element={<div>404 Not Found</div>} />
               </Routes>
             </Layout>
@@ -71,10 +162,11 @@ function AppWrapper() {
   );
 }
 
+/* ===================== APP ===================== */
 export default function App() {
   return (
     <Router>
-      <AppWrapper />
+      <AppRoutes />
     </Router>
   );
 }

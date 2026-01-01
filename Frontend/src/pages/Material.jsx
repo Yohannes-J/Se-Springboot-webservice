@@ -24,8 +24,8 @@ import {
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 /* ================= CONFIG ================= */
-const API = "https://localhost:8081/api/materials";
-const CATEGORIES = ["BOOK", "COMPUTER", "TABLE", "CHAIR", "OTHER"];
+const BASE_URL = import.meta.env.VITE_BACKEND_URL + "/materials";
+const CATEGORIES = ["BOOK", "COMPUTER","MAGAZINE", "OTHER"];
 
 /* ================= COMPONENT ================= */
 export default function Material() {
@@ -66,7 +66,7 @@ export default function Material() {
 
   const loadMaterials = async () => {
     try {
-      const res = await axios.get(API, {
+      const res = await axios.get(BASE_URL, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMaterials(res.data);
@@ -109,7 +109,7 @@ export default function Material() {
       fd.append("material", new Blob([JSON.stringify(form)], { type: "application/json" }));
       if (image) fd.append("imageFile", image);
 
-      await axios.post(API, fd, {
+      await axios.post(BASE_URL, fd, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -142,7 +142,7 @@ export default function Material() {
       fd.append("material", new Blob([JSON.stringify(m)], { type: "application/json" }));
       if (m.newImageFile) fd.append("imageFile", m.newImageFile);
 
-      await axios.put(`${API}/${m.id}`, fd, {
+      await axios.put(`${BASE_URL}/${m.id}`, fd, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Updated");
@@ -160,7 +160,7 @@ export default function Material() {
     setMaterials((prev) => prev.filter((m) => m.id !== id));
 
     try {
-      await axios.delete(`${API}/${id}`, {
+      await axios.delete(`${BASE_URL}/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Deleted");
