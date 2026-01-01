@@ -3,10 +3,11 @@ package org.wldu.webservices.services.contracts;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.wldu.webservices.entities.Materials;
+import org.wldu.webservices.exception.BadRequestException;
+import org.wldu.webservices.exception.ResourceNotFoundException;
 import org.wldu.webservices.repositories.MaterialRepository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,37 +15,75 @@ public class MaterialService {
 
     private final MaterialRepository materialsRepository;
 
-    // Get all materials
+    /* =======================
+       GET ALL MATERIALS
+       ======================= */
     public List<Materials> getAllMaterials() {
         return materialsRepository.findAll();
     }
 
-    // Get material by ID
-    public Optional<Materials> getMaterialById(Long id) {
-        return materialsRepository.findById(id);
+    /* =======================
+       GET MATERIAL BY ID
+       ======================= */
+    public Materials getMaterialById(Long id) {
+        return materialsRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Material not found with id " + id
+                        )
+                );
     }
 
-    // Add new material
+    /* =======================
+       ADD MATERIAL
+       ======================= */
     public Materials addMaterial(Materials material) {
+
+        if (material.getName() == null || material.getName().isBlank()) {
+            throw new BadRequestException(
+                    "Material name is required"
+            );
+        }
+
         return materialsRepository.save(material);
     }
 
-    // Update material
+    /* =======================
+       UPDATE MATERIAL
+       ======================= */
     public Materials updateMaterial(Long id, Materials updatedMaterial) {
-        return materialsRepository.findById(id).map(material -> {
-            material.setName(updatedMaterial.getName());
-            material.setImage(updatedMaterial.getImage());
-            material.setMaterial(updatedMaterial.getMaterial());
-            material.setQuantity(updatedMaterial.getQuantity());
-            material.setLocation(updatedMaterial.getLocation());
-            material.setBorrowable(updatedMaterial.getBorrowable());
-            material.setDescription(updatedMaterial.getDescription());
-            return materialsRepository.save(material);
-        }).orElseThrow(() -> new RuntimeException("Material not found with id " + id));
+
+        return materialsRepository.findById(id)
+                .map(material -> {
+
+                    material.setName(updatedMaterial.getName());
+                    material.setImage(updatedMaterial.getImage());
+                    material.setMaterial(updatedMaterial.getMaterial());
+                    material.setQuantity(updatedMaterial.getQuantity());
+                    material.setLocation(updatedMaterial.getLocation());
+                    material.setBorrowable(updatedMaterial.getBorrowable());
+                    material.setDescription(updatedMaterial.getDescription());
+
+                    return materialsRepository.save(material);
+                })
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Material not found with id " + id
+                        )
+                );
     }
 
-    // Delete material
+    /* =======================
+       DELETE MATERIAL
+       ======================= */
     public void deleteMaterial(Long id) {
+
+        if (!materialsRepository.existsById(id)) {
+            throw new ResourceNotFoundException(
+                    "Material not found with id " + id
+            );
+        }
+
         materialsRepository.deleteById(id);
     }
 }

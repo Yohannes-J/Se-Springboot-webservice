@@ -28,6 +28,8 @@ public class Users {
     @Column(nullable = false)
     private String role;
 
+    private String email;
+
 
     @Column(nullable = false)
     private boolean active = true;

@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import org.wldu.webservices.entities.Book;
 import org.wldu.webservices.entities.BorrowBook;
 import org.wldu.webservices.entities.Customer;
+import org.wldu.webservices.exception.BadRequestException;
+import org.wldu.webservices.exception.ResourceNotFoundException;
 import org.wldu.webservices.repositories.BookRepository;
 import org.wldu.webservices.repositories.BorrowRepository;
 import org.wldu.webservices.repositories.CustomerRepository;
+
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,20 +22,38 @@ public class BorrowService {
     private final BorrowRepository borrowRepo;
     private final CustomerRepository customerRepo;
     private final BookRepository bookRepo;
-    /** Borrow a book */
+
+    /* =======================
+       BORROW BOOK
+       ======================= */
     public BorrowBook borrowBook(Long customerId, Long bookId, int days) {
-        Customer customer = customerRepo.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        Book book = bookRepo.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
-
-        // Check if copies are available
-        if (book.getCopiesAvailable() == null || book.getCopiesAvailable() <= 0) {
-            throw new RuntimeException("No copies available for this book");
+        if (days <= 0) {
+            throw new BadRequestException(
+                    "Borrow days must be greater than zero"
+            );
         }
 
-        // Create borrow record
+        Customer customer = customerRepo.findById(customerId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Customer not found with id: " + customerId
+                        )
+                );
+
+        Book book = bookRepo.findById(bookId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Book not found with id: " + bookId
+                        )
+                );
+
+        if (book.getCopiesAvailable() == null || book.getCopiesAvailable() <= 0) {
+            throw new BadRequestException(
+                    "No copies available for this book"
+            );
+        }
+
         BorrowBook borrow = new BorrowBook();
         borrow.setCustomer(customer);
         borrow.setBook(book);
@@ -40,74 +61,113 @@ public class BorrowService {
         borrow.setReturnDate(LocalDateTime.now().plusDays(days));
         borrow.setReturned(false);
 
-        // Reduce available copies
+        // decrease copies
         book.setCopiesAvailable(book.getCopiesAvailable() - 1);
         bookRepo.save(book);
 
         return borrowRepo.save(borrow);
     }
 
-    /** Return a book */
+    /* =======================
+       RETURN BOOK
+       ======================= */
     public BorrowBook returnBook(Long id) {
+
         BorrowBook borrow = borrowRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Borrow record not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Borrow record not found with id: " + id
+                        )
+                );
+
+        if (borrow.isReturned()) {
+            throw new BadRequestException(
+                    "Book is already returned"
+            );
+        }
+
+        borrow.setReturned(true);
+
+        Book book = borrow.getBook();
+        book.setCopiesAvailable(book.getCopiesAvailable() + 1);
+        bookRepo.save(book);
+
+        return borrowRepo.save(borrow);
+    }
+
+    /* =======================
+       UNDO RETURN
+       ======================= */
+    public BorrowBook undoReturnBook(Long id) {
+
+        BorrowBook borrow = borrowRepo.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Borrow record not found with id: " + id
+                        )
+                );
 
         if (!borrow.isReturned()) {
-            borrow.setReturned(true);
-
-            // Increase book copiesAvailable
-            Book book = borrow.getBook();
-            book.setCopiesAvailable(book.getCopiesAvailable() + 1);
-            bookRepo.save(book);
-
-            borrowRepo.save(borrow);
+            throw new BadRequestException(
+                    "Borrow record is not marked as returned"
+            );
         }
 
-        return borrow;
-    }
-    /** Undo a return (Mistake Correction) */
-    public BorrowBook undoReturnBook(Long id) {
-        BorrowBook borrow = borrowRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Borrow record not found"));
+        Book book = borrow.getBook();
 
-        // Only undo if it is currently marked as returned
-        if (borrow.isReturned()) {
-            borrow.setReturned(false);
-
-            // Decrease book copiesAvailable (it's back with the customer)
-            Book book = borrow.getBook();
-
-            // Check to avoid negative numbers (though rare in this logic)
-            if (book.getCopiesAvailable() != null && book.getCopiesAvailable() > 0) {
-                book.setCopiesAvailable(book.getCopiesAvailable() - 1);
-            } else {
-                book.setCopiesAvailable(0);
-            }
-
-            bookRepo.save(book);
-            return borrowRepo.save(borrow);
+        if (book.getCopiesAvailable() == null || book.getCopiesAvailable() <= 0) {
+            throw new BadRequestException(
+                    "Cannot undo return, no available copies to decrease"
+            );
         }
 
-        return borrow;
+        borrow.setReturned(false);
+        book.setCopiesAvailable(book.getCopiesAvailable() - 1);
+
+        bookRepo.save(book);
+        return borrowRepo.save(borrow);
     }
 
+    /* =======================
+       READ OPERATIONS
+       ======================= */
     public List<BorrowBook> getAllBorrowedBooks() {
         return borrowRepo.findAll();
     }
 
     public List<BorrowBook> getBorrowedBooksByCustomer(Long customerId) {
+
+        if (!customerRepo.existsById(customerId)) {
+            throw new ResourceNotFoundException(
+                    "Customer not found with id: " + customerId
+            );
+        }
+
         return borrowRepo.findByCustomerId(customerId);
     }
 
     public List<BorrowBook> getBorrowedBooksByBook(Long bookId) {
+
+        if (!bookRepo.existsById(bookId)) {
+            throw new ResourceNotFoundException(
+                    "Book not found with id: " + bookId
+            );
+        }
+
         return borrowRepo.findByBookId(bookId);
     }
 
-    // ===== ADD THIS METHOD ONLY =====
+    /* =======================
+       UPDATE PENALTY
+       ======================= */
     public BorrowBook updatePenalty(Long borrowId, BorrowBook penaltyData) {
 
         BorrowBook borrow = borrowRepo.findById(borrowId)
-                .orElseThrow(() -> new RuntimeException("Borrow record not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Borrow record not found with id: " + borrowId
+                        )
+                );
 
         borrow.setBrokenPages(penaltyData.getBrokenPages());
         borrow.setLatePenalty(penaltyData.getLatePenalty());
@@ -117,5 +177,4 @@ public class BorrowService {
 
         return borrowRepo.save(borrow);
     }
-
 }

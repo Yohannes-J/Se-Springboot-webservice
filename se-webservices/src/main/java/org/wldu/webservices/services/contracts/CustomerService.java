@@ -5,9 +5,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.wldu.webservices.entities.Book;
 import org.wldu.webservices.entities.Customer;
+import org.wldu.webservices.exception.BadRequestException;
+import org.wldu.webservices.exception.ResourceNotFoundException;
 import org.wldu.webservices.repositories.CustomerRepository;
+
 
 import java.util.List;
 
@@ -20,15 +22,21 @@ public class CustomerService {
         this.customerRepository = customerRepository;
     }
 
-    // Add new customer
+    /* =======================
+       ADD CUSTOMER
+       ======================= */
     public Customer addCustomer(Customer customer) {
 
         if (customerRepository.existsByEmail(customer.getEmail())) {
-            throw new RuntimeException("Email already exists");
+            throw new BadRequestException(
+                    "Email already exists"
+            );
         }
 
         if (customerRepository.existsByPhoneNumber(customer.getPhoneNumber())) {
-            throw new RuntimeException("Phone number already exists");
+            throw new BadRequestException(
+                    "Phone number already exists"
+            );
         }
 
         if (customer.getRole() == null) {
@@ -38,65 +46,107 @@ public class CustomerService {
         return customerRepository.save(customer);
     }
 
-    // Get all customers
+    /* =======================
+       GET ALL
+       ======================= */
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
 
-    // Get customer by ID
+    /* =======================
+       GET BY ID
+       ======================= */
     public Customer getCustmer(Long id) {
         return customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with id " + id));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Customer not found with id " + id
+                        )
+                );
     }
 
-    // Update customer
+    /* =======================
+       UPDATE CUSTOMER
+       ======================= */
     public Customer updateCustmer(Long id, Customer updatedCustomer) {
 
-        return customerRepository.findById(id).map(customer -> {
+        return customerRepository.findById(id)
+                .map(customer -> {
 
-            customer.setName(updatedCustomer.getName());
-            customer.setRole(updatedCustomer.getRole());
+                    customer.setName(updatedCustomer.getName());
+                    customer.setRole(updatedCustomer.getRole());
 
-            // Email check
-            if (!customer.getEmail().equals(updatedCustomer.getEmail())) {
-                if (customerRepository.existsByEmail(updatedCustomer.getEmail())) {
-                    throw new RuntimeException("Email already exists");
-                }
-                customer.setEmail(updatedCustomer.getEmail());
-            }
+                    // Email validation
+                    if (!customer.getEmail().equals(updatedCustomer.getEmail())) {
+                        if (customerRepository.existsByEmail(updatedCustomer.getEmail())) {
+                            throw new BadRequestException(
+                                    "Email already exists"
+                            );
+                        }
+                        customer.setEmail(updatedCustomer.getEmail());
+                    }
 
-            // Phone number check
-            if (!customer.getPhoneNumber().equals(updatedCustomer.getPhoneNumber())) {
-                if (customerRepository.existsByPhoneNumber(updatedCustomer.getPhoneNumber())) {
-                    throw new RuntimeException("Phone number already exists");
-                }
-                customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
-            }
+                    // Phone validation
+                    if (!customer.getPhoneNumber().equals(updatedCustomer.getPhoneNumber())) {
+                        if (customerRepository.existsByPhoneNumber(updatedCustomer.getPhoneNumber())) {
+                            throw new BadRequestException(
+                                    "Phone number already exists"
+                            );
+                        }
+                        customer.setPhoneNumber(updatedCustomer.getPhoneNumber());
+                    }
 
-            return customerRepository.save(customer);
-
-        }).orElseThrow(() -> new RuntimeException("Customer not found with id " + id));
+                    return customerRepository.save(customer);
+                })
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Customer not found with id " + id
+                        )
+                );
     }
 
-    // Delete customer
+    /* =======================
+       DELETE CUSTOMER
+       ======================= */
     public void deleteCustomer(Long id) {
+
         if (!customerRepository.existsById(id)) {
-            throw new RuntimeException("Customer not found with id " + id);
+            throw new ResourceNotFoundException(
+                    "Customer not found with id " + id
+            );
         }
+
         customerRepository.deleteById(id);
     }
 
-    // Search by name
+    /* =======================
+       SEARCH
+       ======================= */
     public List<Customer> searchByName(String name) {
         return customerRepository.findByNameContainingIgnoreCase(name);
     }
 
-    // Search by email
     public List<Customer> searchByEmail(String email) {
         return customerRepository.findByEmailContainingIgnoreCase(email);
     }
 
-    public Page<Customer> getCustomers(String search, int page, int size, String sortBy, String sortDir) {
+    /* =======================
+       PAGINATION
+       ======================= */
+    public Page<Customer> getCustomers(
+            String search,
+            int page,
+            int size,
+            String sortBy,
+            String sortDir
+    ) {
+
+        if (page < 0 || size <= 0) {
+            throw new BadRequestException(
+                    "Page index must be >= 0 and size must be > 0"
+            );
+        }
+
         Sort sort = sortDir.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -109,7 +159,4 @@ public class CustomerService {
 
         return customerRepository.findAll(pageable);
     }
-
-
-
 }
