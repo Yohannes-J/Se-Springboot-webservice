@@ -16,7 +16,7 @@ Provide access to digital materials for reading and downloading
 
 
 # Core Entities and Description
-1. Customer
+# 1. Customer
 Represents users of the library system.
 Attributes:
 id
@@ -26,7 +26,7 @@ role (STUDENT, STAFF, ADMIN)
 created_at
 Description:
 A customer can borrow multiple books and access digital materials.
-#2. Book
+# 2. Book
 Represents physical books available in the library.
 Attributes:
 id
@@ -39,7 +39,7 @@ available_copies
 updated_at
 Description:
 Tracks inventory and availability of physical books.
-#3.  Borrow
+# 3.  Borrow
 Acts as the central transaction entity connecting customers and books.
 Attributes:
 id
@@ -56,7 +56,7 @@ penalty_amount
 Description:
 Handles borrowing, returning, and penalty calculation.
 Penalty logic is intentionally embedded in this entity to simplify system design.
-#4. Material
+# 4. Material
 Represents books and non-books physical resources in the library.
 Examples:
 Tables
@@ -74,7 +74,7 @@ description
 image
 Description:
 Used for inventory and asset tracking purposes.
-#5. Digital Material
+# 5. Digital Material
 Represents electronic library resources.
 Attributes:
 id
